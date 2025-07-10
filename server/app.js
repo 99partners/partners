@@ -128,9 +128,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5050;
-
 // ✅ Start Server
+const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at https://api.99partners.in`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
