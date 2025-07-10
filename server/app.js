@@ -128,6 +128,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+const PORT = process.env.PORT || 5050;
+
 // ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at https://api.99partners.in`);
