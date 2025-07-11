@@ -8,12 +8,24 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(cors({
-  origin: ["http://localhost:5173","https://99partners.in","https://www.99partners.in"], // ✅ Your React frontend
+// app.use(cors({
+//   origin: ["http://localhost:5173","https://99partners.in","https://www.99partners.in"], // ✅ Your React frontend
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   credentials: true, // Optional: if using cookies or sessions
+// }));
+
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://99partners.in", "https://www.99partners.in"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // Optional: if using cookies or sessions
-}));
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// ✅ Manually handle preflight requests
+app.options("*", cors(corsOptions));
 
 // Models
 const User = require("./models/User");
@@ -34,10 +46,10 @@ app.use(morgan("dev"));
 
 // Google OAuth Client - Handle missing environment variables
 
-  const client = new OAuth2Client(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET
-  );
+const client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
 
 // ✅ Middleware to verify Google ID token
 async function verify(req, res, next) {
