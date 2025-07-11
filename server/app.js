@@ -25,7 +25,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ✅ Manually handle preflight requests
-app.options("*", cors(corsOptions));
+app.options('/protected', cors(corsOptions));
+
+app.use((req, res, next) => {
+  console.log(`🔄 [${req.method}] ${req.path}`);
+  next();
+});
+
 
 // Models
 const User = require("./models/User");
