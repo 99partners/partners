@@ -13,18 +13,12 @@ const app = express();
 // ✅ Load Environment Variables
 const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",").map(item => item.trim())
-  : [
-      "https://99partners.in",
-      "https://www.99partners.in",
-      "http://localhost:5173"
-    ];
+const ALLOWED_ORIGIN = "https://99partners.in"; // Only allow this origin
 
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGINS
+  ALLOWED_ORIGIN
 });
 
 // ✅ Strict CORS Configuration
@@ -33,7 +27,7 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (ALLOWED_ORIGINS.includes(origin)) {
+    if (origin === ALLOWED_ORIGIN) {
       return callback(null, true);
     }
     
@@ -47,10 +41,10 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
-// Apply CORS middleware only once
+// Apply CORS middleware only once - remove any other CORS middleware
 app.use(cors(corsOptions));
 
-// Add middleware to prevent duplicate headers
+// Add middleware to prevent duplicate headers from other sources
 app.use((req, res, next) => {
   // Remove any duplicate headers that might be added elsewhere
   res.removeHeader('Access-Control-Allow-Origin');
@@ -97,29 +91,11 @@ async function verifyGoogleToken(req, res, next) {
   }
 }
 
-// Routes
-const User = require("./models/User");
+// Create API router
+const apiRouter = express.Router();
 
-// Import routes
-const authRoutes = require("./routes/authRoutes");
-const joinRoutes = require("./routes/joinRoutes");
-const contactRoutes = require("./routes/contactRoutes");
-const blogRoutes = require("./routes/blogRoutes");
-const newsletterRoutes = require("./routes/newsletterRoutes");
-const userRoutes = require("./routes/userRoutes");
-const adminRoutes = require("./routes/adminRoutes");
-
-// Apply routes with explicit base path
-app.use("/api", authRoutes);
-app.use("/api/join", joinRoutes);
-app.use("/api/contact", contactRoutes);
-app.use("/api/blogs", blogRoutes);
-app.use("/api/newsletter", newsletterRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/admin", adminRoutes);
-
-// Protected Route with proper CORS handling
-app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
+// Protected Route
+apiRouter.get("/protected", verifyGoogleToken, async (req, res, next) => {
   try {
     const { sub, email, name, picture } = req.user;
     const user = await User.findOneAndUpdate(
@@ -127,15 +103,6 @@ app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
       { email, displayName: name, photo: picture },
       { new: true, upsert: true }
     );
-    
-    // Only set CORS headers if not already set by the cors middleware
-    if (!res.get('Access-Control-Allow-Origin')) {
-      const origin = req.headers.origin;
-      if (ALLOWED_ORIGINS.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
-      }
-      res.header('Access-Control-Allow-Credentials', 'true');
-    }
     
     res.json({ 
       success: true,
@@ -146,6 +113,9 @@ app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
     next(err);
   }
 });
+
+// Mount all API routes under /api
+app.use("/api", apiRouter);
 
 // Default Route
 app.get("/", (req, res) => {
@@ -171,7 +141,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌐 Allowed Origins: ${ALLOWED_ORIGINS.join(", ")}`);
+  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGIN}`);
 });
 
 // require("dotenv").config();
