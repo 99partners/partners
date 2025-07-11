@@ -25,13 +25,22 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ✅ Manually handle preflight requests
-app.options('/protected', cors(corsOptions));
-
-app.use((req, res, next) => {
-  console.log(`🔄 [${req.method}] ${req.path}`);
-  next();
+app.options('/protected', cors(corsOptions), (req, res) => {
+  res.sendStatus(200);
 });
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*"); // <-- Add this line
+  next(createError.NotFound("Route not found"));
+});
+
+app.use((err, req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*"); // <-- Add this line
+  res.status(err.status || 500).json({
+    status: err.status || 500,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 // Models
 const User = require("./models/User");
@@ -81,11 +90,6 @@ async function verify(req, res, next) {
     next(createError.Unauthorized(err.message));
   }
 }
-
-// Ensure CORS preflight for /protected returns 200 and headers
-app.options('/protected', cors(corsOptions), (req, res) => {
-  res.sendStatus(200);
-});
 
 // ✅ Protected Route (Google login verification)
 app.get('/protected', cors(corsOptions), verify, async (req, res, next) => {
