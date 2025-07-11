@@ -25,7 +25,7 @@ const Domains = () => {
         "Customer relationship management",
         "Analytics and reporting tools",
       ],
-      image: "/Digital_Commerce_Mohit99.webp",
+      image: "/src/assets/DigitalCommerce_Mohit99.webp",
     },
     {
       id: "it-marketing",
@@ -45,7 +45,7 @@ const Domains = () => {
         "Content creation and management",
         "SEO and digital advertising",
       ],
-      image: "/IT_Services_Mohit99.webp",
+      image: "/src/assets/IT_Services_Mohit99.webp",
     },
     {
       id: "financial-services",
@@ -65,7 +65,7 @@ const Domains = () => {
         "Insurance solutions",
         "Tax planning and compliance",
       ],
-      image: "/Financial_Service_Mohit99.webp",
+      image: "/src/assets/Financial_Service_Mohit99.webp",
     },
     {
       id: "spiritual-ecosystem",
@@ -85,7 +85,7 @@ const Domains = () => {
         "Spiritual counseling",
         "Wellness retreats and workshops",
       ],
-      image: "/Spritual_Support_Mohit99.webp",
+      image: "/src/assets/Spritual_Support_Mohit99.webp",
     },
   ];
 
