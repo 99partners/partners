@@ -18,7 +18,7 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   : [
       "https://99partners.in",
       "https://www.99partners.in",
-      "http://localhost:5173"
+      // "http://localhost:5173"
     ];
 
 console.log("Environment Variables Loaded:", {
