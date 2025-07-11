@@ -82,6 +82,11 @@ async function verify(req, res, next) {
   }
 }
 
+// Ensure CORS preflight for /protected returns 200 and headers
+app.options('/protected', cors(corsOptions), (req, res) => {
+  res.sendStatus(200);
+});
+
 // ✅ Protected Route (Google login verification)
 app.get('/protected', cors(corsOptions), verify, async (req, res, next) => {
   try {
