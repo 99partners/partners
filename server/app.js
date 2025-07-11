@@ -47,14 +47,17 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
-// Apply CORS middleware only once - with debug logging
+// Apply CORS middleware only once
+app.use(cors(corsOptions));
+
+// Add middleware to prevent duplicate headers
 app.use((req, res, next) => {
-  console.log(`Incoming ${req.method} request to ${req.path} from origin: ${req.headers.origin}`);
+  // Remove any duplicate headers that might be added elsewhere
+  res.removeHeader('Access-Control-Allow-Origin');
+  res.removeHeader('Access-Control-Allow-Methods');
+  res.removeHeader('Access-Control-Allow-Headers');
   next();
 });
-
-// Only use cors middleware - remove any other CORS-related middleware
-app.use(cors(corsOptions));
 
 // Standard middleware
 app.use(express.json());
@@ -115,7 +118,7 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Protected Route with explicit CORS headers
+// Protected Route with proper CORS handling
 app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
   try {
     const { sub, email, name, picture } = req.user;
@@ -125,14 +128,20 @@ app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
       { new: true, upsert: true }
     );
     
-    // Explicitly set headers for this endpoint
-    const origin = req.headers.origin;
-    if (ALLOWED_ORIGINS.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin);
+    // Only set CORS headers if not already set by the cors middleware
+    if (!res.get('Access-Control-Allow-Origin')) {
+      const origin = req.headers.origin;
+      if (ALLOWED_ORIGINS.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+      }
+      res.header('Access-Control-Allow-Credentials', 'true');
     }
-    res.header('Access-Control-Allow-Credentials', 'true');
     
-    res.send({ message: "Authorized access granted", user });
+    res.json({ 
+      success: true,
+      message: "Authorized access granted", 
+      user 
+    });
   } catch (err) {
     next(err);
   }
@@ -164,7 +173,6 @@ app.listen(PORT, () => {
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
   console.log(`🌐 Allowed Origins: ${ALLOWED_ORIGINS.join(", ")}`);
 });
-
 
 // require("dotenv").config();
 // const express = require("express");
