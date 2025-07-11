@@ -4,17 +4,24 @@ const cors = require("cors");
 
 const app = express();
 
-const allowedOrigins = [
-  "https://99partners.in",
-  "https://www.99partners.in",
-  // "http://localhost:5173",
-];
+// Dynamic allowed origins from environment
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : [
+      "https://99partners.in",
+      "https://www.99partners.in",
+      "http://localhost:5173" // optional for development
+    ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('Blocked by CORS:', origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
