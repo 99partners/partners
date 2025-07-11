@@ -8,18 +8,10 @@ const { OAuth2Client } = require("google-auth-library");
 
 const app = express();
 
-// ✅ CORS Setup (TOP of file)
-// const corsOptions = {
-//   origin: ["http://localhost:5173", "https://99partners.in", "https://www.99partners.in"],
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-//   credentials: true,
-// };
-
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://99partners.in",
   "https://www.99partners.in",
+  "http://localhost:5173",
 ];
 
 const corsOptions = {
@@ -45,7 +37,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Preflight
+app.options("*", cors(corsOptions));
 
 // ✅ Middleware
 app.use(express.json());
@@ -150,8 +142,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at https://api.99partners.in`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
 });
-
-
 
 
 // require("dotenv").config();
