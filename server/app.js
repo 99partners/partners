@@ -1,55 +1,94 @@
-// require("dotenv").config();
 require('dotenv').config({ path: __dirname + '/.env' });
-console.log('Environment Variables:', {
-  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
-  NODE_ENV: process.env.NODE_ENV
-});
 
 const express = require("express");
 const cors = require("cors");
-
-const app = express();
-
-// Dynamic allowed origins from environment
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : [
-      "https://99partners.in",
-      "https://www.99partners.in",
-      "http://localhost:5173" // optional for development
-    ];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowed = process.env.ALLOWED_ORIGINS.split(',');
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error('CORS blocked for origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['X-Custom-Request']
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable preflight for all routes
-
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const createError = require("http-errors");
 const { OAuth2Client } = require("google-auth-library");
 
+// Initialize Express App
+const app = express();
+
+// ✅ Load Environment Variables
+const PORT = process.env.PORT || 5050;
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [
+      "https://99partners.in",
+      "https://www.99partners.in",
+      "http://localhost:5173"
+    ];
+
+console.log("Environment Variables Loaded:", {
+  PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  ALLOWED_ORIGINS
+});
+
+// ✅ Setup CORS Options
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("❌ CORS blocked for:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  exposedHeaders: ["X-Custom-Request"],
+  optionsSuccessStatus: 204,
+  maxAge: 86400
+};
+
 // ✅ Middleware
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Preflight
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
-// ✅ Models & Routes
+// ✅ MongoDB Connection
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected:", MONGO_URI))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+// ✅ Google OAuth Setup
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
+
+// ✅ Auth Middleware
+async function verifyGoogleToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return next(createError.Unauthorized("Missing token"));
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) return next(createError.Unauthorized("Invalid token"));
+
+    req.user = payload;
+    next();
+  } catch (error) {
+    next(createError.Unauthorized(error.message));
+  }
+}
+
+// ✅ Routes
 const User = require("./models/User");
+
 const authRoutes = require("./routes/authRoutes");
 const joinRoutes = require("./routes/joinRoutes");
 const contactRoutes = require("./routes/contactRoutes");
@@ -66,65 +105,25 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ✅ Google OAuth Client
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
-);
-
-// ✅ Middleware to verify Google ID token
-async function verify(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return next(createError.Unauthorized());
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    if (payload) {
-      req.user = payload;
-      next();
-    } else {
-      next(createError.Unauthorized());
-    }
-  } catch (err) {
-    next(createError.Unauthorized(err.message));
-  }
-}
-
-// ✅ Protected Route
-app.get("/protected", verify, async (req, res, next) => {
+// ✅ Protected Route Example
+app.get("/protected", verifyGoogleToken, async (req, res, next) => {
   try {
     const { sub, email, name, picture } = req.user;
-
     const user = await User.findOneAndUpdate(
       { googleId: sub },
       { email, displayName: name, photo: picture },
       { new: true, upsert: true }
     );
-
-    res.send({ message: "You are authorized", user });
+    res.send({ message: "Authorized access granted", user });
   } catch (err) {
     next(err);
   }
 });
 
-// ✅ Root Route
+// ✅ Default Route
 app.get("/", (req, res) => {
   res.send({ message: "✅ Server is up and running!" });
 });
-
-// ✅ MongoDB Connection
-const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-mongoose
-  .connect(mongoUri)
-  .then(() => console.log("✅ MongoDB connected to:", mongoUri))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ 404 Handler
 app.use((req, res, next) => {
@@ -133,19 +132,19 @@ app.use((req, res, next) => {
 
 // ✅ Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("Global error handler:", err);
+  console.error("❌ Global error:", err.message);
   res.status(err.status || 500).json({
     status: err.status || 500,
-    message: err.message || "Internal Server Error",
+    message: err.message || "Internal Server Error"
   });
 });
 
 // ✅ Start Server
-const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at https://api.99partners.in`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🚀 Server is running on https://api.99partners.in`);
+  console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
 });
+
 
 
 // require("dotenv").config();
