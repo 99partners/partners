@@ -29,25 +29,27 @@ console.log("Environment Variables Loaded:", {
 
 // ✅ Setup CORS Options
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("❌ CORS blocked for:", origin);
-      callback(new Error("Not allowed by CORS"));
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (ALLOWED_ORIGINS.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from ${origin}`;
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  exposedHeaders: ["X-Custom-Request"],
-  optionsSuccessStatus: 204,
-  maxAge: 86400
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
-// ✅ Middleware
+// Apply CORS only once
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Preflight
+
+// app.options("*", cors(corsOptions)); // Preflight
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
