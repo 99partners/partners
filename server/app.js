@@ -83,7 +83,7 @@ async function verify(req, res, next) {
 }
 
 // ✅ Protected Route (Google login verification)
-app.get('/protected', verify, async (req, res, next) => {
+app.get('/protected', cors(corsOptions), verify, async (req, res, next) => {
   try {
     const { sub, email, name, picture } = req.user;
 
