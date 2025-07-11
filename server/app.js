@@ -7,7 +7,7 @@ const app = express();
 const allowedOrigins = [
   "https://99partners.in",
   "https://www.99partners.in",
-  "http://localhost:5173",
+  // "http://localhost:5173",
 ];
 
 const corsOptions = {
