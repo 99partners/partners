@@ -1,10 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const morgan = require("morgan");
-const createError = require("http-errors");
-const { OAuth2Client } = require("google-auth-library");
 
 const app = express();
 
@@ -38,6 +34,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
+const mongoose = require("mongoose");
+const morgan = require("morgan");
+const createError = require("http-errors");
+const { OAuth2Client } = require("google-auth-library");
 
 // ✅ Middleware
 app.use(express.json());
