@@ -8,7 +8,7 @@ const PartnerManagement = () => {
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const res = await axios.get("http://localhost:5050/api/join");
+        const res = await axios.get("https://api.99partners.in/api/join");
         setPartners(res.data);
       } catch (err) {
         console.error("Failed to fetch partners:", err);

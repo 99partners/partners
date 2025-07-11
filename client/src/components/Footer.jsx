@@ -22,7 +22,7 @@ const Footer = () => {
     if (!emailRegex.test(email)) return alert("Please enter a valid email address.");
 
     try {
-      const response = await axios.post("http://localhost:5050/api/newsletter", { email });
+      const response = await axios.post("https://api.99partners.in/api/newsletter", { email });
       if (response.status === 200) {
         setIsSubmitted(true);
         setEmail('');

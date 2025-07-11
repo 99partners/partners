@@ -15,11 +15,11 @@ const BlogDetail = () => {
     const fetchPostAndRelated = async () => {
       try {
         // Fetch single post
-        const res = await axios.get(`http://localhost:5050/api/blogs/${id}`);
+        const res = await axios.get(`https://api.99partners.in/api/blogs/${id}`);
         setPost(res.data);
 
         // Fetch all blogs to suggest others
-        const all = await axios.get(`http://localhost:5050/api/blogs`);
+        const all = await axios.get(`https://api.99partners.in/api/blogs`);
         const filtered = all.data.filter((b) => b._id !== id);
         setOtherBlogs(filtered.slice(0, 3)); // limit to 3
       } catch (err) {

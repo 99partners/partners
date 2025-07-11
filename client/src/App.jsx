@@ -85,7 +85,7 @@ function App() {
           const payload = decodeJwt(credential);
           console.log('✅ Decoded Payload:', payload);
   
-          const res = await axios.get('http://localhost:5050/protected', {
+          const res = await axios.get('https://api.99partners.in/protected', {
             headers: {
               Authorization: `Bearer ${credential}`,
             },

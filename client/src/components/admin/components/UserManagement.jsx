@@ -11,8 +11,8 @@ const UserManagement = () => {
     const fetchAllData = async () => {
       try {
         const [usersRes, newsletterRes] = await Promise.all([
-          axios.get("http://localhost:5050/api/users"),
-          axios.get("http://localhost:5050/api/newsletter")
+          axios.get("https://api.99partners.in/api/users"),
+          axios.get("https://api.99partners.in/api/newsletter")
         ]);
 
         const usersList = usersRes.data;

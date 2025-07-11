@@ -15,7 +15,7 @@ const Blogs = () => {
   const fetchBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5050/api/blogs");
+      const res = await axios.get("https://api.99partners.in/api/blogs");
       setBlogPosts(res.data);
 
       // Extract categories from blog data

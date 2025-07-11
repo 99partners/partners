@@ -31,7 +31,7 @@ const BlogManagement = () => {
   // ✅ Fetch all blogs (Draft + Published) for admin
   useEffect(() => {
     axios
-      .get('http://localhost:5050/api/blogs?all=true')
+      .get('https://api.99partners.in/api/blogs?all=true')
       .then((res) => setBlogPosts(res.data))
       .catch((err) => console.error('Error fetching blogs:', err));
   }, []);
@@ -78,11 +78,11 @@ const BlogManagement = () => {
       let response;
       if (isEditing && formData._id) {
         console.log("📝 Updating existing blog...");
-        response = await axios.put(`http://localhost:5050/api/blogs/${formData._id}`, formData);
+        response = await axios.put(`https://api.99partners.in/api/blogs/${formData._id}`, formData);
         showNotification('Blog updated successfully!');
       } else {
         console.log("📝 Creating new blog...");
-        response = await axios.post('http://localhost:5050/api/blogs', formData);
+        response = await axios.post('https://api.99partners.in/api/blogs', formData);
         showNotification('Blog created successfully!');
       }
 
@@ -102,7 +102,7 @@ const BlogManagement = () => {
       setTimeout(async () => {
         try {
           console.log("🔄 Refreshing blog list from server...");
-          const refreshResponse = await axios.get('http://localhost:5050/api/blogs?all=true');
+          const refreshResponse = await axios.get('https://api.99partners.in/api/blogs?all=true');
           console.log("📊 Refreshed list has", refreshResponse.data.length, "blogs");
           setBlogPosts(refreshResponse.data);
         } catch (refreshError) {
@@ -127,7 +127,7 @@ const BlogManagement = () => {
     const confirmed = window.confirm('Are you sure you want to delete this blog?');
     if (confirmed) {
       try {
-        await axios.delete(`http://localhost:5050/api/blogs/${id}`);
+        await axios.delete(`https://api.99partners.in/api/blogs/${id}`);
         setBlogPosts(blogPosts.filter((post) => post._id !== id));
         showNotification('Blog deleted successfully! Note: Frontend will need to be refreshed to see changes.');
       } catch (error) {
@@ -201,7 +201,7 @@ const BlogManagement = () => {
       <button 
         onClick={async () => {
           try {
-            const response = await axios.get('http://localhost:5050/api/blogs/debug/state');
+            const response = await axios.get('https://api.99partners.in/api/blogs/debug/state');
             console.log("🔍 Database state:", response.data);
             showNotification(`DB: ${response.data.totalBlogs} total, ${response.data.publishedBlogs} published, ${response.data.draftBlogs} draft`, 'success');
           } catch (error) {

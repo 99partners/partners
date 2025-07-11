@@ -29,7 +29,7 @@ const ContactForm = () => {
     try {
  
 
-      const res =await axios.post("http://localhost:5050/api/contact", formData, {
+      const res =await axios.post("https://api.99partners.in/api/contact", formData, {
           headers: {
             "Content-Type": "application/json",
           }

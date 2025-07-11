@@ -12,7 +12,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/api/admin/stats");
+      const res = await axios.get("https://api.99partners.in/api/admin/stats");
       setStats(res.data);
     } catch (error) {
       console.error("Error fetching stats:", error);
