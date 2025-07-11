@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
+  ? process.env.ALLOWED_ORIGINS.split(",").map(item => item.trim())
   : [
       "https://99partners.in",
       "https://www.99partners.in",
@@ -24,32 +24,31 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGINS
+  ALLOWED_ORIGINS: ALLOWED_ORIGINS
 });
 
-// ✅ Setup CORS Options
+// ✅ Improved CORS Configuration
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (ALLOWED_ORIGINS.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from ${origin}`;
-      return callback(new Error(msg), false);
+      console.log(`CORS blocked for origin: ${origin}`);
+      return callback(new Error(`The CORS policy for this site does not allow access from ${origin}`), false);
     }
     return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
-// Apply CORS only once
+// Apply CORS middleware only once
 app.use(cors(corsOptions));
 
-// app.options("*", cors(corsOptions)); // Preflight
-
+// Standard middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
@@ -143,10 +142,10 @@ app.use((err, req, res, next) => {
 
 // ✅ Start Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on https://api.99partners.in`);
+  console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🌐 Allowed Origins: ${ALLOWED_ORIGINS.join(", ")}`);
 });
-
 
 
 // require("dotenv").config();
