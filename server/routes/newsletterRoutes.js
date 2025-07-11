@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 // POST /api/newsletter – subscribe a new email
 router.post('/', async (req, res) => {
+  console.log('Newsletter POST route hit!');
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: 'Email is required.' });
 
@@ -44,6 +45,7 @@ router.post('/', async (req, res) => {
 
 // ✅ NEW: GET /api/newsletter – fetch all newsletter subscribers
 router.get('/', async (req, res) => {
+  console.log('Newsletter GET route hit!');
   try {
     // Check if MongoDB is connected
     if (mongoose.connection.readyState !== 1) {
