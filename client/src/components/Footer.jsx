@@ -22,16 +22,56 @@ const Footer = () => {
     if (!emailRegex.test(email)) return alert("Please enter a valid email address.");
 
     try {
-      const response = await axios.post("https://api.99partners.in/api/newsletter", { email });
-      if (response.status === 200) {
+      const response = await axios.post(
+        "https://api.99partners.in/api/newsletter",
+        { email },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      // Check for success (2xx status codes)
+      if (response.status >= 200 && response.status < 300) {
         setIsSubmitted(true);
         setEmail('');
+      } else {
+        alert("Subscription failed. Please try again later.");
       }
     } catch (error) {
       console.error("Subscription failed:", error);
-      alert("Subscription failed. Try again later.");
+      let errorMessage = "Subscription failed. Try again later.";
+
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        errorMessage = error.response.data.message ||
+          `Server responded with ${error.response.status}`;
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = "No response from server";
+      }
+
+      alert(errorMessage);
     }
   };
+
+  // const handleSubscribe = async () => {
+  //   if (!email) return alert("Please enter an email.");
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!emailRegex.test(email)) return alert("Please enter a valid email address.");
+
+  //   try {
+  //     const response = await axios.post("https://api.99partners.in/api/newsletter", { email });
+  //     if (response.status === 200) {
+  //       setIsSubmitted(true);
+  //       setEmail('');
+  //     }
+  //   } catch (error) {
+  //     console.error("Subscription failed:", error);
+  //     alert("Subscription failed. Try again later.");
+  //   }
+  // };
 
   const quickLinks = [
     { name: 'About Us', path: '/about' },
