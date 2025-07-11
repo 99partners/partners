@@ -23,30 +23,19 @@ console.log("Environment Variables Loaded:", {
 
 // ✅ Strict CORS Configuration
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (origin === ALLOWED_ORIGIN) {
-      return callback(null, true);
-    }
-    
-    console.log(`❌ CORS blocked for origin: ${origin}`);
-    return callback(new Error(`Not allowed by CORS`), false);
-  },
+  origin: ALLOWED_ORIGIN, // Simplified to only allow one origin
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: [],
   optionsSuccessStatus: 200
 };
 
-// Apply CORS middleware only once - remove any other CORS middleware
+// Apply CORS middleware only once
 app.use(cors(corsOptions));
 
-// Add middleware to prevent duplicate headers from other sources
+// Add middleware to prevent duplicate headers
 app.use((req, res, next) => {
-  // Remove any duplicate headers that might be added elsewhere
+  // Remove any duplicate headers
   res.removeHeader('Access-Control-Allow-Origin');
   res.removeHeader('Access-Control-Allow-Methods');
   res.removeHeader('Access-Control-Allow-Headers');
@@ -68,6 +57,15 @@ const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
 );
+
+// Define User Schema and Model
+const userSchema = new mongoose.Schema({
+  googleId: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
+  displayName: String,
+  photo: String
+});
+const User = mongoose.model('User', userSchema);
 
 // Auth Middleware
 async function verifyGoogleToken(req, res, next) {
