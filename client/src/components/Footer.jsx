@@ -23,7 +23,7 @@ const Footer = () => {
 
     try {
       const response = await axios.post(
-        "https://api.99partners.in/newsletter",
+        "https://api.99partners.in/newsletter/",
         { email },
         {
           headers: {
