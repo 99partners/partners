@@ -130,7 +130,7 @@ app.use("/", authRoutes);
 app.use("/api/join", joinRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
-app.use("/newsletter", newsletterRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
