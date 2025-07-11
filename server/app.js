@@ -1,4 +1,10 @@
-require("dotenv").config();
+// require("dotenv").config();
+require('dotenv').config({ path: __dirname + '/.env' });
+console.log('Environment Variables:', {
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
+  NODE_ENV: process.env.NODE_ENV
+});
+
 const express = require("express");
 const cors = require("cors");
 
@@ -15,32 +21,22 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
+    const allowed = process.env.ALLOWED_ORIGINS.split(',');
+    if (!origin || allowed.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('Blocked by CORS:', origin);
-      callback(new Error("Not allowed by CORS"));
+      console.error('CORS blocked for origin:', origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "X-Requested-With",
-    "Accept",
-    "X-Custom-Request",
-    "Cache-Control",
-    "Pragma",
-  ],
   credentials: true,
-  exposedHeaders: ["X-Custom-Request"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['X-Custom-Request']
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable preflight for all routes
 
 const mongoose = require("mongoose");
 const morgan = require("morgan");
