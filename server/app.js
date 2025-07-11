@@ -24,28 +24,36 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGINS: ALLOWED_ORIGINS
+  ALLOWED_ORIGINS
 });
 
-// ✅ Improved CORS Configuration
+// ✅ Strict CORS Configuration
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (ALLOWED_ORIGINS.indexOf(origin) === -1) {
-      console.log(`CORS blocked for origin: ${origin}`);
-      return callback(new Error(`The CORS policy for this site does not allow access from ${origin}`), false);
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    
+    console.log(`❌ CORS blocked for origin: ${origin}`);
+    return callback(new Error(`Not allowed by CORS`), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: [],
+  optionsSuccessStatus: 200
 };
 
-// Apply CORS middleware only once
+// Apply CORS middleware only once - with debug logging
+app.use((req, res, next) => {
+  console.log(`Incoming ${req.method} request to ${req.path} from origin: ${req.headers.origin}`);
+  next();
+});
+
+// Only use cors middleware - remove any other CORS-related middleware
 app.use(cors(corsOptions));
 
 // Standard middleware
@@ -53,19 +61,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
-// ✅ MongoDB Connection
-mongoose
-  .connect(MONGO_URI)
+// MongoDB Connection
+mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connected:", MONGO_URI))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Google OAuth Setup
+// Google OAuth Setup
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
 );
 
-// ✅ Auth Middleware
+// Auth Middleware
 async function verifyGoogleToken(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return next(createError.Unauthorized("Missing token"));
@@ -87,9 +94,10 @@ async function verifyGoogleToken(req, res, next) {
   }
 }
 
-// ✅ Routes
+// Routes
 const User = require("./models/User");
 
+// Import routes
 const authRoutes = require("./routes/authRoutes");
 const joinRoutes = require("./routes/joinRoutes");
 const contactRoutes = require("./routes/contactRoutes");
@@ -98,7 +106,8 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-app.use("/", authRoutes);
+// Apply routes with explicit base path
+app.use("/api", authRoutes);
 app.use("/api/join", joinRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
@@ -106,8 +115,8 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ✅ Protected Route Example
-app.get("/protected", verifyGoogleToken, async (req, res, next) => {
+// Protected Route with explicit CORS headers
+app.get("/api/protected", verifyGoogleToken, async (req, res, next) => {
   try {
     const { sub, email, name, picture } = req.user;
     const user = await User.findOneAndUpdate(
@@ -115,23 +124,32 @@ app.get("/protected", verifyGoogleToken, async (req, res, next) => {
       { email, displayName: name, photo: picture },
       { new: true, upsert: true }
     );
+    
+    // Explicitly set headers for this endpoint
+    const origin = req.headers.origin;
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
     res.send({ message: "Authorized access granted", user });
   } catch (err) {
     next(err);
   }
 });
 
-// ✅ Default Route
+// Default Route
 app.get("/", (req, res) => {
   res.send({ message: "✅ Server is up and running!" });
 });
 
-// ✅ 404 Handler
+// 404 Handler
 app.use((req, res, next) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   next(createError.NotFound("Route not found"));
 });
 
-// ✅ Global Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error("❌ Global error:", err.message);
   res.status(err.status || 500).json({
@@ -140,7 +158,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Start Server
+// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
