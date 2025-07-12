@@ -113,9 +113,6 @@ apiRouter.get("/protected", verifyGoogleToken, async (req, res, next) => {
   }
 });
 
-// Mount all API routes under /api
-app.use("/api", apiRouter);
-
 // Import and register additional routes
 const authRoutes = require("./routes/authRoutes");
 const joinRoutes = require("./routes/joinRoutes");
@@ -133,6 +130,9 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+
+// Mount API router for protected routes
+app.use("/api", apiRouter);
 
 // Default Route
 app.get("/", (req, res) => {
