@@ -19,4 +19,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    'process.env.VITE_API_BASE_URL': JSON.stringify(
+      mode === 'development' 
+        ? 'http://localhost:5050' 
+        : 'https://api.99partners.in'
+    ),
+  },
 }));

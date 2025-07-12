@@ -4,20 +4,9 @@ const Newsletter = require('../models/Newsletter');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 
-console.log('📦 Newsletter routes loaded successfully');
-
-// Test route to verify newsletter router is working
-router.get('/test', (req, res) => {
-  console.log('🧪 Newsletter test route hit!');
-  res.json({ message: 'Newsletter router is working!', timestamp: new Date().toISOString() });
-});
-
 // POST /api/newsletter – subscribe a new email
 router.post('/', async (req, res) => {
-  console.log('🎯 Newsletter POST route hit!');
-  console.log('📧 Request body:', req.body);
-  console.log('🔗 URL:', req.url);
-  console.log('📝 Method:', req.method);
+  console.log('Newsletter POST route hit!');
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: 'Email is required.' });
 

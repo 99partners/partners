@@ -10,6 +10,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import logo from "../assets/99 logo gradient.webp";
 import { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../lib/api";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -23,7 +24,7 @@ const Footer = () => {
 
     try {
       const response = await axios.post(
-        "https://api.99partners.in/api/newsletter",
+        API_ENDPOINTS.newsletter,
         { email },
         {
           headers: {
