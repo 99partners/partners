@@ -131,6 +131,11 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
+// Debug route to test if server is working
+app.get("/api/test", (req, res) => {
+  res.json({ message: "API is working!", timestamp: new Date().toISOString() });
+});
+
 // Mount API router for protected routes
 app.use("/api", apiRouter);
 
