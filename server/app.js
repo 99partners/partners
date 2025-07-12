@@ -58,15 +58,8 @@ const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_SECRET
 );
 
-// Define User Schema and Model
-const userSchema = new mongoose.Schema({
-  googleId: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  displayName: String,
-  photo: String,
-  role: { type: String, enum: ['user', 'admin'], default: 'user' } // Added role field for adminRoutes
-});
-const User = mongoose.model('User', userSchema);
+// Import User model
+const User = require('./models/User');
 
 // Auth Middleware
 async function verifyGoogleToken(req, res, next) {
