@@ -1,5 +1,14 @@
 // API configuration
-export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:5050';
+export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.99partners.in';
+
+// Debug logging (only in development)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 API Configuration:', {
+    VITE_API_BASE_URL: process.env.VITE_API_BASE_URL,
+    API_BASE_URL: API_BASE_URL,
+    NODE_ENV: process.env.NODE_ENV
+  });
+}
 
 // Helper function to build API URLs
 export const buildApiUrl = (endpoint) => {

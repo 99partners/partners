@@ -22,6 +22,14 @@ const Footer = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return alert("Please enter a valid email address.");
 
+    // Debug logging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📧 Newsletter subscription attempt:', {
+        endpoint: API_ENDPOINTS.newsletter,
+        email: email
+      });
+    }
+
     try {
       const response = await axios.post(
         API_ENDPOINTS.newsletter,
