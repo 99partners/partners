@@ -62,7 +62,7 @@ const BlogDetail = () => {
         <img
           src={post.photo}
           alt={post.title}
-          className="w-full h-75 object-cover rounded-lg mb-6"
+          className="w-full h-64 object-cover rounded-lg mb-6"
         />
 
         <div className="mb-4 flex flex-wrap items-center gap-2">
