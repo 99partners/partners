@@ -4,7 +4,7 @@ import "../styles/main.css";
 const Sidebar = ({ activeTab, setActiveTab }) => {
   return (
     <aside className="sidebar">
-      <h1 className="sidebar-title">Admin Panel</h1>
+      <h1 className="sidebar-title">99 Partners</h1>
 
       <div className="sidebar-section">
         <h2>MAIN MENU</h2>
