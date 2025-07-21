@@ -14,6 +14,7 @@ const DomainHighlights = () => {
       title: "Digital Commerce",
       description:
         "ONDC integration, e-commerce solutions, and co-branding opportunities for modern businesses.",
+      backContent: ["Launch", "Manage", "Grow", "Co-Branding"],
       color: "from-green-500 to-green-500",
       darkColor: "dark:from-cyan-400 dark:to-green-500",
       bgColor: "bg-green-50 dark:bg-cyan-900/20",
@@ -24,6 +25,13 @@ const DomainHighlights = () => {
       title: "AI & IT Services",
       description:
         "Complete KPO, BPO, LPO services with cutting-edge digital strategy development.",
+      backContent: [
+        "Artificial Intelligence",
+        "Data Engineering",
+        "Generative AI",
+        "DevOps",
+        "Development Services",
+      ],
       color: "from-blue-500 to-blue-500",
       darkColor: "dark:from-emerald-400 dark:to-green-500",
       bgColor: "bg-blue-50 dark:bg-emerald-900/20",
@@ -34,6 +42,13 @@ const DomainHighlights = () => {
       title: "Financial Services",
       description:
         "SME loan facilitation and tailored funding support solutions for scalable business growth.",
+      backContent: [
+        "Banking & Landing Services",
+        "Capital Market Services",
+        "Accounting Audit Advisory",
+        "Corporate Finance Advisory",
+        "Fintech Services",
+      ],
       color: "from-purple-500 to-violet-500",
       darkColor: "dark:from-purple-400 dark:to-violet-500",
       bgColor: "bg-purple-50 dark:bg-purple-900/20",
@@ -44,6 +59,11 @@ const DomainHighlights = () => {
       title: "Spiritual Ecosystem",
       description:
         "Holistic wellness through yoga, Ayurveda, astrology, and spiritual guidance.",
+      backContent: [
+        "Wellness & Rejuvenation",
+        "Spiritual & Astrological",
+        "Star Gazing",
+      ],
       color: "from-orange-500 to-pink-500",
       darkColor: "dark:from-pink-400 dark:to-orange-500",
       bgColor: "bg-orange-50 dark:bg-pink-900/20",
@@ -79,6 +99,10 @@ const DomainHighlights = () => {
         .flip-card-front {
           z-index: 2;
           transform: rotateY(0deg);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
         .flip-card-back {
           transform: rotateY(180deg);
@@ -91,7 +115,8 @@ const DomainHighlights = () => {
             Explore Our <span className="gradient-text">Business Domains</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover comprehensive solutions across four strategic verticals designed to accelerate your business growth.
+            Discover comprehensive solutions across four strategic verticals
+            designed to accelerate your business growth.
           </p>
         </div>
 
@@ -107,37 +132,38 @@ const DomainHighlights = () => {
                 <div className="flip-card-inner rounded-2xl shadow-xl">
                   {/* Front Side */}
                   <div
-                    className={`flip-card-front glass p-6 sm:p-8 text-center rounded-2xl ${domain.bgColor}`}
+                    className={`flip-card-front glass p-6 sm:p-8 rounded-2xl ${domain.bgColor}`}
                   >
                     <div
-                      className={`w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-r ${domain.color} ${domain.darkColor} p-3 shadow-md`}
+                      className={`w-14 h-14 sm:w-16 sm:h-16 mb-5 rounded-2xl bg-gradient-to-r ${domain.color} ${domain.darkColor} p-3 shadow-md`}
                     >
                       <Icon className="w-full h-full text-white" />
                     </div>
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2 sm:mb-3">
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground">
                       {domain.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      {domain.description.slice(0, 60)}...
-                    </p>
                   </div>
 
                   {/* Back Side */}
                   <div
                     className={`flip-card-back glass p-6 sm:p-8 text-center rounded-2xl ${domain.bgColor}`}
                   >
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground mb-4">
                       {domain.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
-                      {domain.description}
-                    </p>
-                    <Link
-                      to="/domains"
+                    <ul className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
+                      {domain.backContent.map((item, idx) => (
+                        <li key={idx} className="mb-2">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <a
+                      href="/domains"
                       className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-all"
                     >
                       Learn More <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </a>
                   </div>
                 </div>
               </div>
