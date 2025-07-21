@@ -18,8 +18,13 @@ const Header = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  const scrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
+
   const handleJoinUsClick = () => {
     setIsMenuOpen(false);
+    scrollToTop();
     navigate("/join");
   };
 
@@ -30,7 +35,12 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center space-x-1 group" aria-label="99 Partners Home">
+          <Link
+            to="/"
+            className="flex items-center space-x-1 group"
+            aria-label="99 Partners Home"
+            onClick={scrollToTop}
+          >
             <div className="relative">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 overflow-hidden">
                 <img
@@ -56,6 +66,7 @@ const Header = () => {
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
                 aria-current={isActive(item.path) ? "page" : undefined}
+                onClick={scrollToTop}
               >
                 {item.name}
                 <span
@@ -119,7 +130,10 @@ const Header = () => {
                       : "text-muted-foreground"
                   }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    scrollToTop();
+                  }}
                   aria-current={isActive(item.path) ? "page" : undefined}
                 >
                   {item.name}
