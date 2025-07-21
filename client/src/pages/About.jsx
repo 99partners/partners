@@ -48,12 +48,23 @@ const About = () => {
                   Partners
                 </span>
               </h1>
-              <p className="text-xl text-muted-foreground dark:text-neutral-300 fade-in-up stagger-1">
-                To be the premier ecosystem where visionary partners converge to unlock transformative growth and holistic prosperity for businesses and individuals.
-              </p>
             </div>
           </div>
         </section>  
+
+        {/* Vision Statement */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-card border rounded-2xl p-8 glass fade-in-up">
+                <h2 className="text-3xl font-bold text-card-foreground dark:text-white mb-6">Our Vision</h2>
+                <p className="text-lg text-muted-foreground dark:text-neutral-300 leading-relaxed">
+                  To be the premier ecosystem where visionary partners converge to unlock transformative growth and holistic prosperity for businesses and individuals.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Mission Statement */}
         <section className="py-16">
