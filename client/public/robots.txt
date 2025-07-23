@@ -1,14 +1,5 @@
 User-agent: *
-Allow: /
-Allow: /about
-Allow: /domains
-Allow: /blogs
-Allow: /contact
-Allow: /join
-Allow: /faqs
-Allow: /privacy-policy
-Allow: /terms-of-service
-Allow: /cookie-policy
+Disallow: /
 
 Disallow: /admin/
 Disallow: /admin/*
