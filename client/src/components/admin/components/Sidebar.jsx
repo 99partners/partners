@@ -2,6 +2,14 @@ import React from "react";
 import "../styles/main.css";
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
+  const menuItems = [
+    { label: 'Dashboard', path: '/admin/dashboard' },
+    { label: 'Blog Management', path: '/admin/blogs' },
+    { label: 'Partnership Applications', path: '/admin/partners' },
+    { label: 'User Management', path: '/admin/users' },
+    { label: 'Contact Management', path: '/admin/contacts' },
+  ];
+
   return (
     <aside className="sidebar">
       <h1 className="sidebar-title">99 Partners</h1>

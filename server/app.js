@@ -115,6 +115,14 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
+// Ensure uploads directory exists
+const fs = require('fs');
+const path = require('path');
+const uploadsDir = path.join(__dirname, 'uploads/proposals');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // ✅ Register Routes
 app.use("/", authRoutes);
 app.use("/api/join", joinRoutes);
@@ -123,6 +131,7 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/uploads', express.static('uploads'));
 
 // Mount API router for protected routes
 app.use("/api", apiRouter);
