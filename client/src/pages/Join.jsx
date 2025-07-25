@@ -12,32 +12,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const Join = () => {
   const [data, setData] = useState({
-    // Section 1: Contact Information
-    fullName: "",
-    company: "",
+    name: "",
     designation: "",
+    company: "",
     email: "",
-    phone: "",
     website: "",
 
     // Section 2: Business Information
     businessType: "",
-    otherBusinessType: "",
-    businessDescription: "",
-    services: "",
-    yearsInOperation: "",
-
-    // Section 3: Partnership Goals
-    partnershipReason: "",
-    partnershipType: [],
-    otherPartnershipType: "",
+    goal: "",
     targetAudience: "",
-    collaborationVision: "",
-
-    // Section 4: Supporting Information
-    proposalFile: null,
-    comments: "",
-    agreeTerms: false,
+    description: "",
   });
 
   const [error, setError] = useState("");
@@ -45,22 +30,8 @@ const Join = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
-
-    if (type === "checkbox") {
-      if (name === "agreeTerms") {
-        setData((prev) => ({ ...prev, [name]: checked }));
-      } else {
-        const updatedTypes = checked
-          ? [...data.partnershipType, value]
-          : data.partnershipType.filter((type) => type !== value);
-        setData((prev) => ({ ...prev, partnershipType: updatedTypes }));
-      }
-    } else if (type === "file") {
-      setData((prev) => ({ ...prev, proposalFile: files[0] }));
-    } else {
-      setData((prev) => ({ ...prev, [name]: value }));
-    }
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -69,61 +40,36 @@ const Join = () => {
     setSuccess("");
     setIsSubmitting(true);
 
-    if (!data.agreeTerms) {
-      setError("Please agree to the terms and conditions.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const formData = new FormData();
-    for (const key in data) {
-      if (key === "partnershipType") {
-        data[key].forEach((item) => formData.append("partnershipType", item));
-      } else if (key === "proposalFile" && data[key]) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    }
-
     try {
       const res = await fetch("https://api.99partners.in/api/join", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
 
       if (res.ok) {
-        setSuccess("Thank you! Your application has been submitted successfully.");
+        alert("Thank you! We have received your information.");
         setData({
-          fullName: "",
-          company: "",
+          name: "",
           designation: "",
+          company: "",
           email: "",
-          phone: "",
           website: "",
           businessType: "",
-          otherBusinessType: "",
-          businessDescription: "",
-          services: "",
-          yearsInOperation: "",
-          partnershipReason: "",
-          partnershipType: [],
-          otherPartnershipType: "",
+          goal: "",
           targetAudience: "",
-          collaborationVision: "",
-          proposalFile: null,
-          comments: "",
-          agreeTerms: false,
+          description: "",
         });
       } else {
-        const errorData = await res.json();
-        setError(errorData.message || "Submission failed. Please try again.");
+        const err = await res.json();
+        console.error("Error submitting form:", err);
+        alert("Submission failed. Please try again.");
       }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Something went wrong. Please try again.");
     }
   };
 
@@ -147,307 +93,166 @@ const Join = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-32 pb-16 px-4">
-        <Card className="max-w-4xl mx-auto p-8">
-          <h1 className="text-4xl font-bold mb-6 text-center text-card-foreground">
-            Partnership Application Form
+
+      <main className="pb-16 pt-32 px-4">
+        <div className="max-w-3xl mx-auto bg-card shadow-lg rounded-xl p-8">
+          <h1 className="text-4xl font-bold mb-8 text-center text-card-foreground">
+            Partnership Form
           </h1>
-          <p className="text-center mb-10 text-muted-foreground">
-            Thank you for your interest in partnering with 99 Partners. Please complete the form below to help us understand your business and explore how we can collaborate.
-          </p>
 
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              {error}
-            </Alert>
-          )}
-
-          {success && (
-            <Alert className="mb-6 bg-green-50 text-green-700 border-green-200">
-              {success}
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Section 1: Contact Information */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold border-b pb-2">Section 1: Contact Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    name="fullName"
-                    value={data.fullName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company">Company Name</Label>
-                  <Input
-                    id="company"
-                    name="company"
-                    value={data.company}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="designation">Designation/Role</Label>
-                  <Input
-                    id="designation"
-                    name="designation"
-                    value={data.designation}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={data.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={data.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="website">Company Website/Portfolio (if any)</Label>
-                  <Input
-                    id="website"
-                    name="website"
-                    type="url"
-                    value={data.website}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2: Business Information */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold border-b pb-2">Section 2: Business Information</h2>
-              
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label>Type of Business</Label>
-                <RadioGroup
-                  name="businessType"
-                  value={data.businessType}
-                  onValueChange={(value) => handleChange({ target: { name: "businessType", value } })}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2"
-                >
-                  {businessTypes.map((type) => (
-                    <div key={type} className="flex items-center space-x-2">
-                      <RadioGroupItem value={type} id={`business-${type}`} />
-                      <Label htmlFor={`business-${type}`}>{type}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-                {data.businessType === "Other" && (
-                  <Input
-                    name="otherBusinessType"
-                    value={data.otherBusinessType}
-                    onChange={handleChange}
-                    placeholder="Please specify"
-                    className="mt-2"
-                  />
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="businessDescription">Describe Your Business (Max 200 words)</Label>
-                <Textarea
-                  id="businessDescription"
-                  name="businessDescription"
-                  value={data.businessDescription}
+                <label className="text-sm font-medium text-card-foreground">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={data.name}
                   onChange={handleChange}
                   required
-                  className="h-32"
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  placeholder="Your full name"
                 />
               </div>
-
               <div>
-                <Label htmlFor="services">What Products/Services Do You Offer?</Label>
-                <Textarea
-                  id="services"
-                  name="services"
-                  value={data.services}
+                <label className="text-sm font-medium text-card-foreground">
+                  Designation
+                </label>
+                <input
+                  type="text"
+                  name="designation"
+                  value={data.designation}
                   onChange={handleChange}
                   required
-                />
-              </div>
-
-              <div>
-                <Label>Years in Operation</Label>
-                <RadioGroup
-                  name="yearsInOperation"
-                  value={data.yearsInOperation}
-                  onValueChange={(value) => handleChange({ target: { name: "yearsInOperation", value } })}
-                  className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Start-Up" id="years-startup" />
-                    <Label htmlFor="years-startup">Start-Up (Less than 2 years)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="2-5 Years" id="years-2-5" />
-                    <Label htmlFor="years-2-5">2-5 Years</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="More than 5 Years" id="years-5plus" />
-                    <Label htmlFor="years-5plus">More than 5 Years</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-
-            {/* Section 3: Partnership Goals */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold border-b pb-2">Section 3: Partnership Goals</h2>
-              
-              <div>
-                <Label htmlFor="partnershipReason">Why Do You Want to Partner with 99 Partners?</Label>
-                <Textarea
-                  id="partnershipReason"
-                  name="partnershipReason"
-                  value={data.partnershipReason}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label>What Type of Partnership Are You Looking For?</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                  {partnershipTypes.map((type) => (
-                    <div key={type} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`partnership-${type}`}
-                        name="partnershipType"
-                        value={type}
-                        checked={data.partnershipType.includes(type)}
-                        onCheckedChange={(checked) =>
-                          handleChange({
-                            target: {
-                              name: "partnershipType",
-                              value: type,
-                              type: "checkbox",
-                              checked,
-                            },
-                          })
-                        }
-                      />
-                      <Label htmlFor={`partnership-${type}`}>{type}</Label>
-                    </div>
-                  ))}
-                </div>
-                {data.partnershipType.includes("Other") && (
-                  <Input
-                    name="otherPartnershipType"
-                    value={data.otherPartnershipType}
-                    onChange={handleChange}
-                    placeholder="Please specify"
-                    className="mt-2"
-                  />
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="targetAudience">Target Audience/Market</Label>
-                <Textarea
-                  id="targetAudience"
-                  name="targetAudience"
-                  value={data.targetAudience}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="collaborationVision">How Do You Envision Our Collaboration? (Max 300 words)</Label>
-                <Textarea
-                  id="collaborationVision"
-                  name="collaborationVision"
-                  value={data.collaborationVision}
-                  onChange={handleChange}
-                  required
-                  className="h-32"
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  placeholder="Your role"
                 />
               </div>
             </div>
 
-            {/* Section 4: Supporting Information */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold border-b pb-2">Section 4: Supporting Information</h2>
-              
+            <div>
+              <label className="text-sm font-medium text-card-foreground">
+                Company Name
+              </label>
+              <input
+                type="text"
+                name="company"
+                value={data.company}
+                onChange={handleChange}
+                required
+                className="w-full mt-1 p-3 border rounded-lg bg-background"
+                placeholder="Company or brand"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="proposalFile">Upload Business Proposal or Pitch Deck (Optional)</Label>
-                <Input
-                  id="proposalFile"
-                  name="proposalFile"
-                  type="file"
-                  accept=".pdf,.ppt,.pptx,.doc,.docx"
+                <label className="text-sm font-medium text-card-foreground">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={data.email}
                   onChange={handleChange}
-                  className="mt-1"
+                  required
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  placeholder="name@example.com"
                 />
               </div>
-
               <div>
-                <Label htmlFor="comments">Additional Comments or Questions</Label>
-                <Textarea
-                  id="comments"
-                  name="comments"
-                  value={data.comments}
+                <label className="text-sm font-medium text-card-foreground">
+                  Website (Optional)
+                </label>
+                <input
+                  type="url"
+                  name="website"
+                  value={data.website}
                   onChange={handleChange}
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  placeholder="https://yourwebsite.com"
                 />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={data.agreeTerms}
-                  onCheckedChange={(checked) =>
-                    handleChange({
-                      target: {
-                        name: "agreeTerms",
-                        type: "checkbox",
-                        checked,
-                      },
-                    })
-                  }
-                />
-                <Label htmlFor="agreeTerms" className="text-sm">
-                  By submitting this form, I confirm that the information provided is accurate to the best of my knowledge. 
-                  I agree to be contacted by the 99 Partners team regarding this application.
-                </Label>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Your Application"}
-            </Button>
+            <div>
+              <label className="text-sm font-medium text-card-foreground">
+                Business Type
+              </label>
+              <select
+                name="businessType"
+                value={data.businessType}
+                onChange={handleChange}
+                required
+                className="w-full mt-1 p-3 border rounded-lg bg-background"
+              >
+                <option value="">Select your business type</option>
+                <option value="Digital Commerce">Digital Commerce</option>
+                <option value="IT & Marketing">AI & IT Services</option>
+                <option value="Financial Services">Financial Services</option>
+                <option value="Spiritual Wellness">Spiritual Wellness</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-card-foreground">
+                Goal
+              </label>
+              <textarea
+                name="goal"
+                value={data.goal}
+                onChange={handleChange}
+                required
+                rows={3}
+                className="w-full mt-1 p-3 border rounded-lg bg-background"
+                placeholder="Your goal for this partnership"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-card-foreground">
+                Target Audience
+              </label>
+              <textarea
+                name="targetAudience"
+                value={data.targetAudience}
+                onChange={handleChange}
+                required
+                rows={3}
+                className="w-full mt-1 p-3 border rounded-lg bg-background"
+                placeholder="Who are your customers or users?"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-card-foreground">
+                Describe Your Business
+              </label>
+              <textarea
+                name="description"
+                value={data.description}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full mt-1 p-3 border rounded-lg bg-background"
+                placeholder="Tell us about what your company does"
+              ></textarea>
+            </div>
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
+              >
+                Submit
+              </button>
+            </div>
           </form>
         </Card>
       </main>
+
       <Footer />
     </div>
   );
