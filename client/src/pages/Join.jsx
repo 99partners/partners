@@ -440,3 +440,62 @@ const Join = () => {
 };
 
 export default Join;
+// ...existing code...
+for (const key in data) {
+  if (key === "partnershipType") {
+    data[key].forEach((item) => formData.append("partnershipType", item)); // <-- remove []
+  } else {
+    formData.append(key, data[key]);
+  }
+}
+// ...existing code...// ...existing code...
+    const {
+      fullName,
+      company,
+      designation,
+      email,
+      phone,
+      website,
+      businessType,
+      otherBusinessType,
+      businessDescription,
+      services,
+      yearsInOperation,
+      partnershipReason,
+      otherPartnershipType,
+      targetAudience,
+      collaborationVision,
+      comments,
+      agreeTerms,
+    } = req.body;
+
+    // Parse partnershipType as array
+    let partnershipType = req.body.partnershipType;
+    if (typeof partnershipType === "string") {
+      partnershipType = [partnershipType];
+    } else if (!Array.isArray(partnershipType)) {
+      partnershipType = [];
+    }
+
+    const newEntry = new Join({
+      fullName,
+      company,
+      designation,
+      email,
+      phone,
+      website,
+      businessType,
+      otherBusinessType,
+      businessDescription,
+      services,
+      yearsInOperation,
+      partnershipReason,
+      partnershipType,
+      otherPartnershipType,
+      targetAudience,
+      collaborationVision,
+      comments,
+      agreeTerms: agreeTerms === "true" || agreeTerms === true,
+      proposalFile: req.file?.filename || null,
+    });
+// ...existing code...
