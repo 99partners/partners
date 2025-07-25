@@ -1,28 +1,37 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const Join = () => {
   const [data, setData] = useState({
-    name: "",
+    // Section 1: Contact Information
+    fullName: "",
+    companyName: "",
     designation: "",
-    company: "",
     email: "",
+    phone: "",
     website: "",
 
     // Section 2: Business Information
     businessType: "",
-    goal: "",
+    otherBusinessType: "",
+    businessDescription: "",
+    services: "",
+    yearsInOperation: "",
+
+    // Section 3: Partnership Goals
+    partnershipReason: "",
+    partnershipTypes: [],
+    otherPartnershipType: "",
     targetAudience: "",
-    description: "",
+    collaborationVision: "",
+
+    // Section 4: Supporting Information
+    proposalFile: null,
+    additionalComments: "",
+    
+    // Consent & Declaration
+    agreeToTerms: false
   });
 
   const [error, setError] = useState("");
@@ -30,8 +39,23 @@ const Join = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked, files } = e.target;
+
+    if (type === "checkbox") {
+      if (name === "agreeToTerms") {
+        setData(prev => ({ ...prev, [name]: checked }));
+      } else {
+        // Handle partnership type checkboxes
+        const updatedTypes = checked
+          ? [...data.partnershipTypes, value]
+          : data.partnershipTypes.filter(type => type !== value);
+        setData(prev => ({ ...prev, partnershipTypes: updatedTypes }));
+      }
+    } else if (type === "file") {
+      setData(prev => ({ ...prev, proposalFile: files[0] }));
+    } else {
+      setData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -40,36 +64,61 @@ const Join = () => {
     setSuccess("");
     setIsSubmitting(true);
 
+    if (!data.agreeToTerms) {
+      setError("Please agree to the terms and conditions.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const formData = new FormData();
+    for (const key in data) {
+      if (key === "partnershipTypes") {
+        data[key].forEach(type => formData.append("partnershipTypes", type));
+      } else if (key === "proposalFile" && data[key]) {
+        formData.append(key, data[key]);
+      } else {
+        formData.append(key, data[key]);
+      }
+    }
+
     try {
       const res = await fetch("https://api.99partners.in/api/join", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData
       });
 
       if (res.ok) {
-        alert("Thank you! We have received your information.");
+        setSuccess("Thank you! Your application has been submitted successfully.");
         setData({
-          name: "",
+          fullName: "",
+          companyName: "",
           designation: "",
-          company: "",
           email: "",
+          phone: "",
           website: "",
           businessType: "",
-          goal: "",
+          otherBusinessType: "",
+          businessDescription: "",
+          services: "",
+          yearsInOperation: "",
+          partnershipReason: "",
+          partnershipTypes: [],
+          otherPartnershipType: "",
           targetAudience: "",
-          description: "",
+          collaborationVision: "",
+          proposalFile: null,
+          additionalComments: "",
+          agreeToTerms: false
         });
       } else {
-        const err = await res.json();
-        console.error("Error submitting form:", err);
-        alert("Submission failed. Please try again.");
+        const errorData = await res.json();
+        setError(errorData.message || "Submission failed. Please try again.");
       }
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Something went wrong. Please try again.");
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -93,166 +142,305 @@ const Join = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
-      <main className="pb-16 pt-32 px-4">
+      <main className="pt-32 pb-16 px-4">
         <div className="max-w-3xl mx-auto bg-card shadow-lg rounded-xl p-8">
-          <h1 className="text-4xl font-bold mb-8 text-center text-card-foreground">
-            Partnership Form
+          <h1 className="text-4xl font-bold mb-6 text-center text-card-foreground">
+            Partnership Application Form
           </h1>
+          <p className="text-center mb-10 text-muted-foreground">
+            Thank you for your interest in partnering with 99 Partners. Please complete the form below to help us understand your business and explore how we can collaborate.
+          </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 text-green-700 border border-green-200 rounded-lg">
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-8" encType="multipart/form-data">
+            {/* Section 1: Contact Information */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold border-b pb-2">Section 1: Contact Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Full Name</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={data.fullName}
+                    onChange={handleChange}
+                    required
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Company Name</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={data.companyName}
+                    onChange={handleChange}
+                    required
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Designation/Role</label>
+                  <input
+                    type="text"
+                    name="designation"
+                    value={data.designation}
+                    onChange={handleChange}
+                    required
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={data.phone}
+                    onChange={handleChange}
+                    required
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-card-foreground">Company Website/Portfolio (if any)</label>
+                  <input
+                    type="url"
+                    name="website"
+                    value={data.website}
+                    onChange={handleChange}
+                    className="w-full mt-1 p-3 border rounded-lg bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Business Information */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold border-b pb-2">Section 2: Business Information</h2>
+              
               <div>
-                <label className="text-sm font-medium text-card-foreground">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={data.name}
+                <label className="text-sm font-medium text-card-foreground">Type of Business</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                  {businessTypes.map((type) => (
+                    <div key={type} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id={`business-${type}`}
+                        name="businessType"
+                        value={type}
+                        checked={data.businessType === type}
+                        onChange={handleChange}
+                        className="rounded-full"
+                      />
+                      <label htmlFor={`business-${type}`}>{type}</label>
+                    </div>
+                  ))}
+                </div>
+                {data.businessType === "Other" && (
+                  <input
+                    type="text"
+                    name="otherBusinessType"
+                    value={data.otherBusinessType}
+                    onChange={handleChange}
+                    placeholder="Please specify"
+                    className="w-full mt-2 p-3 border rounded-lg bg-background"
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-card-foreground">Describe Your Business (Max 200 words)</label>
+                <textarea
+                  name="businessDescription"
+                  value={data.businessDescription}
                   onChange={handleChange}
                   required
+                  rows={4}
                   className="w-full mt-1 p-3 border rounded-lg bg-background"
-                  placeholder="Your full name"
-                />
+                ></textarea>
               </div>
+
               <div>
-                <label className="text-sm font-medium text-card-foreground">
-                  Designation
-                </label>
-                <input
-                  type="text"
-                  name="designation"
-                  value={data.designation}
+                <label className="text-sm font-medium text-card-foreground">What Products/Services Do You Offer?</label>
+                <textarea
+                  name="services"
+                  value={data.services}
                   onChange={handleChange}
                   required
+                  rows={3}
                   className="w-full mt-1 p-3 border rounded-lg bg-background"
-                  placeholder="Your role"
-                />
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-card-foreground">Years in Operation</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+                  {["Start-Up", "2-5 Years", "More than 5 Years"].map((year) => (
+                    <div key={year} className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id={`year-${year}`}
+                        name="yearsInOperation"
+                        value={year}
+                        checked={data.yearsInOperation === year}
+                        onChange={handleChange}
+                        className="rounded-full"
+                      />
+                      <label htmlFor={`year-${year}`}>{year}</label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-card-foreground">
-                Company Name
-              </label>
-              <input
-                type="text"
-                name="company"
-                value={data.company}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-3 border rounded-lg bg-background"
-                placeholder="Company or brand"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Section 3: Partnership Goals */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold border-b pb-2">Section 3: Partnership Goals</h2>
+              
               <div>
-                <label className="text-sm font-medium text-card-foreground">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={data.email}
+                <label className="text-sm font-medium text-card-foreground">Why Do You Want to Partner with 99 Partners?</label>
+                <textarea
+                  name="partnershipReason"
+                  value={data.partnershipReason}
                   onChange={handleChange}
                   required
+                  rows={3}
                   className="w-full mt-1 p-3 border rounded-lg bg-background"
-                  placeholder="name@example.com"
-                />
+                ></textarea>
               </div>
+
               <div>
-                <label className="text-sm font-medium text-card-foreground">
-                  Website (Optional)
-                </label>
-                <input
-                  type="url"
-                  name="website"
-                  value={data.website}
+                <label className="text-sm font-medium text-card-foreground">What Type of Partnership Are You Looking For?</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                  {partnershipTypes.map((type) => (
+                    <div key={type} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`partnership-${type}`}
+                        name="partnershipTypes"
+                        value={type}
+                        checked={data.partnershipTypes.includes(type)}
+                        onChange={handleChange}
+                        className="rounded"
+                      />
+                      <label htmlFor={`partnership-${type}`}>{type}</label>
+                    </div>
+                  ))}
+                </div>
+                {data.partnershipTypes.includes("Other") && (
+                  <input
+                    type="text"
+                    name="otherPartnershipType"
+                    value={data.otherPartnershipType}
+                    onChange={handleChange}
+                    placeholder="Please specify"
+                    className="w-full mt-2 p-3 border rounded-lg bg-background"
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-card-foreground">Target Audience/Market</label>
+                <textarea
+                  name="targetAudience"
+                  value={data.targetAudience}
                   onChange={handleChange}
+                  required
+                  rows={3}
                   className="w-full mt-1 p-3 border rounded-lg bg-background"
-                  placeholder="https://yourwebsite.com"
-                />
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-card-foreground">How Do You Envision Our Collaboration? (Max 300 words)</label>
+                <textarea
+                  name="collaborationVision"
+                  value={data.collaborationVision}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                ></textarea>
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-card-foreground">
-                Business Type
-              </label>
-              <select
-                name="businessType"
-                value={data.businessType}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-3 border rounded-lg bg-background"
-              >
-                <option value="">Select your business type</option>
-                <option value="Digital Commerce">Digital Commerce</option>
-                <option value="IT & Marketing">AI & IT Services</option>
-                <option value="Financial Services">Financial Services</option>
-                <option value="Spiritual Wellness">Spiritual Wellness</option>
-              </select>
+            {/* Section 4: Supporting Information */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold border-b pb-2">Section 4: Supporting Information</h2>
+              
+              <div>
+                <label className="text-sm font-medium text-card-foreground">Upload Business Proposal or Pitch Deck (Optional)</label>
+                <input
+                  type="file"
+                  name="proposalFile"
+                  onChange={handleChange}
+                  accept=".pdf,.doc,.docx,.ppt,.pptx"
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-card-foreground">Additional Comments or Questions</label>
+                <textarea
+                  name="additionalComments"
+                  value={data.additionalComments}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full mt-1 p-3 border rounded-lg bg-background"
+                ></textarea>
+              </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-card-foreground">
-                Goal
-              </label>
-              <textarea
-                name="goal"
-                value={data.goal}
-                onChange={handleChange}
-                required
-                rows={3}
-                className="w-full mt-1 p-3 border rounded-lg bg-background"
-                placeholder="Your goal for this partnership"
-              ></textarea>
+            {/* Consent & Declaration */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="agreeToTerms"
+                  name="agreeToTerms"
+                  checked={data.agreeToTerms}
+                  onChange={handleChange}
+                  className="rounded"
+                />
+                <label htmlFor="agreeToTerms" className="text-sm">
+                  By submitting this form, I confirm that the information provided is accurate to the best of my knowledge. 
+                  I agree to be contacted by the 99 Partners team regarding this application.
+                </label>
+              </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-card-foreground">
-                Target Audience
-              </label>
-              <textarea
-                name="targetAudience"
-                value={data.targetAudience}
-                onChange={handleChange}
-                required
-                rows={3}
-                className="w-full mt-1 p-3 border rounded-lg bg-background"
-                placeholder="Who are your customers or users?"
-              ></textarea>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-card-foreground">
-                Describe Your Business
-              </label>
-              <textarea
-                name="description"
-                value={data.description}
-                onChange={handleChange}
-                required
-                rows={4}
-                className="w-full mt-1 p-3 border rounded-lg bg-background"
-                placeholder="Tell us about what your company does"
-              ></textarea>
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
-              >
-                Submit
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition disabled:opacity-50"
+            >
+              {isSubmitting ? "Submitting..." : "Submit Your Application"}
+            </button>
           </form>
         </div>
       </main>
-
       <Footer />
     </div>
   );
