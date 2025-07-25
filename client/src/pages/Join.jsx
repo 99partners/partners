@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
+import { API_ENDPOINTS } from "@/lib/api";
 
 const Join = () => {
   const [data, setData] = useState({
@@ -85,7 +86,7 @@ const Join = () => {
     }
 
     try {
-      const res = await fetch("https://api.99partners.in/api/join", {
+      const res = await fetch(API_ENDPOINTS.join, {
         method: "POST",
         body: formData, // FormData automatically sets the correct Content-Type
       });

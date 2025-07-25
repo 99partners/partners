@@ -13,17 +13,30 @@ const app = express();
 // ✅ Load Environment Variables
 const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-const ALLOWED_ORIGIN = "https://99partners.in"; // Only allow this origin
+const ALLOWED_ORIGINS = [
+  "https://99partners.in",
+  "http://localhost:5173", // Vite default dev server
+  "http://localhost:3000"  // Common React dev server
+];
 
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGIN
+  ALLOWED_ORIGINS
 });
 
 // ✅ Strict CORS Configuration
 const corsOptions = {
-  origin: ALLOWED_ORIGIN,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (ALLOWED_ORIGINS.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -151,5 +164,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGIN}`);
+  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGINS.join(', ')}`);
 });
