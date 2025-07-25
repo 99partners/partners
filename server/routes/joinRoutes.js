@@ -1,49 +1,113 @@
 // routes/joinRoutes.js
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Join = require("../models/JoinEntry");
-const mongoose = require("mongoose");
+const JoinEntry = require('../models/JoinEntry');
+const multer = require('multer');
+const path = require('path');
 
-// POST - existing route to submit join form
-router.post("/", async (req, res) => {
-  try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️  MongoDB not connected for join form submission");
-      return res.status(200).json({ 
-        message: "Application submitted successfully (Database not available).",
-        warning: "Database connection not available. Application not persisted."
-      });
-    }
-
-    const newEntry = new Join(req.body);
-    const saved = await newEntry.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    console.error("❌ Error saving join entry:", err);
-    // Return success even on database error for better UX
-    res.status(200).json({ 
-      message: "Application submitted successfully.",
-      warning: "Database operation failed. Application may not be persisted."
-    });
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/proposals/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
-// ✅ NEW: GET all partner entries
-router.get("/", async (req, res) => {
-  try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log("⚠️  MongoDB not connected for join entries fetch");
-      return res.status(200).json([]);
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PDF, DOC, DOCX, PPT, and PPTX files are allowed.'));
     }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
-    const partners = await Join.find();
-    res.status(200).json(partners);
-  } catch (err) {
-    console.error("❌ Error fetching join entries:", err);
-    // Return empty array on error
-    res.status(200).json([]);
+// POST - Create new partnership application
+router.post('/', upload.single('proposalFile'), async (req, res) => {
+  try {
+    const {
+      fullName,
+      companyName,
+      designation,
+      email,
+      phone,
+      website,
+      businessType,
+      otherBusinessType,
+      businessDescription,
+      services,
+      yearsInOperation,
+      partnershipReason,
+      partnershipTypes,
+      otherPartnershipType,
+      targetAudience,
+      collaborationVision,
+      additionalComments,
+      agreeToTerms
+    } = req.body;
+
+    // Create new join entry
+    const newEntry = new JoinEntry({
+      fullName,
+      companyName,
+      designation,
+      email,
+      phone,
+      website,
+      businessType,
+      otherBusinessType,
+      businessDescription,
+      services,
+      yearsInOperation,
+      partnershipReason,
+      partnershipTypes: Array.isArray(partnershipTypes) ? partnershipTypes : [partnershipTypes],
+      otherPartnershipType,
+      targetAudience,
+      collaborationVision,
+      additionalComments,
+      proposalFile: req.file ? req.file.filename : null,
+      agreeToTerms: agreeToTerms === 'true'
+    });
+
+    await newEntry.save();
+    res.status(201).json({ message: 'Partnership application submitted successfully' });
+  } catch (error) {
+    console.error('Error saving partnership application:', error);
+    res.status(500).json({ message: 'Error submitting application', error: error.message });
+  }
+});
+
+// GET - Fetch all partnership applications (for admin)
+router.get('/', async (req, res) => {
+  try {
+    const entries = await JoinEntry.find().sort({ createdAt: -1 });
+    res.json(entries);
+  } catch (error) {
+    console.error('Error fetching partnership applications:', error);
+    res.status(500).json({ message: 'Error fetching applications', error: error.message });
+  }
+});
+
+// GET - Fetch single partnership application
+router.get('/:id', async (req, res) => {
+  try {
+    const entry = await JoinEntry.findById(req.id);
+    if (!entry) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+    res.json(entry);
+  } catch (error) {
+    console.error('Error fetching partnership application:', error);
+    res.status(500).json({ message: 'Error fetching application', error: error.message });
   }
 });
 
