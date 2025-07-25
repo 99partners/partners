@@ -71,15 +71,25 @@ const Join = () => {
     }
 
     const formData = new FormData();
-    for (const key in data) {
-      if (key === "partnershipTypes") {
-        data[key].forEach(type => formData.append("partnershipTypes", type));
-      } else if (key === "proposalFile" && data[key]) {
-        formData.append(key, data[key]);
+
+    // Append all form fields to FormData
+    Object.keys(data).forEach(key => {
+      if (key === 'partnershipTypes') {
+        // Handle array of partnership types
+        data[key].forEach(type => {
+          formData.append('partnershipTypes', type);
+        });
+      } else if (key === 'proposalFile' && data[key]) {
+        // Handle file upload
+        formData.append('proposalFile', data[key]);
+      } else if (key === 'agreeToTerms') {
+        // Convert boolean to string
+        formData.append(key, data[key].toString());
       } else {
+        // Handle all other fields
         formData.append(key, data[key]);
       }
-    }
+    });
 
     try {
       const res = await fetch("https://api.99partners.in/api/join", {
@@ -87,36 +97,46 @@ const Join = () => {
         body: formData
       });
 
-      if (res.ok) {
-        setSuccess("Thank you! Your application has been submitted successfully.");
-        setData({
-          fullName: "",
-          companyName: "",
-          designation: "",
-          email: "",
-          phone: "",
-          website: "",
-          businessType: "",
-          otherBusinessType: "",
-          businessDescription: "",
-          services: "",
-          yearsInOperation: "",
-          partnershipReason: "",
-          partnershipTypes: [],
-          otherPartnershipType: "",
-          targetAudience: "",
-          collaborationVision: "",
-          proposalFile: null,
-          additionalComments: "",
-          agreeToTerms: false
-        });
-      } else {
+      if (!res.ok) {
         const errorData = await res.json();
-        setError(errorData.message || "Submission failed. Please try again.");
+        throw new Error(errorData.message || 'Submission failed');
       }
+
+      const result = await res.json();
+      setSuccess("Thank you! Your application has been submitted successfully.");
+      
+      // Reset form
+      setData({
+        fullName: "",
+        companyName: "",
+        designation: "",
+        email: "",
+        phone: "",
+        website: "",
+        businessType: "",
+        otherBusinessType: "",
+        businessDescription: "",
+        services: "",
+        yearsInOperation: "",
+        partnershipReason: "",
+        partnershipTypes: [],
+        otherPartnershipType: "",
+        targetAudience: "",
+        collaborationVision: "",
+        proposalFile: null,
+        additionalComments: "",
+        agreeToTerms: false
+      });
+
+      // Reset file input if it exists
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+
     } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
+      console.error('Error submitting form:', err);
+      setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
