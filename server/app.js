@@ -13,30 +13,17 @@ const app = express();
 // ✅ Load Environment Variables
 const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-const ALLOWED_ORIGINS = [
-  "https://99partners.in",
-  "http://localhost:5173",  // Vite default dev server
-  "http://localhost:3000"   // Alternative local development
-];
+const ALLOWED_ORIGIN = "https://99partners.in"; // Only allow this origin
 
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGINS
+  ALLOWED_ORIGIN
 });
 
 // ✅ Strict CORS Configuration
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (ALLOWED_ORIGINS.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ALLOWED_ORIGIN,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -128,14 +115,6 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// Ensure uploads directory exists
-const fs = require('fs');
-const path = require('path');
-const uploadsDir = path.join(__dirname, 'uploads/proposals');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
 // ✅ Register Routes
 app.use("/", authRoutes);
 app.use("/api/join", joinRoutes);
@@ -144,7 +123,6 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use('/uploads', express.static('uploads'));
 
 // Mount API router for protected routes
 app.use("/api", apiRouter);
@@ -173,5 +151,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGINS.join(', ')}`);
+  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGIN}`);
 });
