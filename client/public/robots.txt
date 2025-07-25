@@ -1,7 +1,2 @@
 User-agent: *
 Disallow: /
-
-Disallow: /admin/
-Disallow: /admin/*
-
-Sitemap: https://www.99partners.in/sitemap.xml
