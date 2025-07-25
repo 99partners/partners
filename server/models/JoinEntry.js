@@ -38,7 +38,7 @@ const joinSchema = new mongoose.Schema(
     collaborationVision: String,
     comments: String,
     agreeTerms: Boolean,
-    proposalFile: String, // store filename only
+    proposalFile: String,
   },
   { timestamps: true }
 );

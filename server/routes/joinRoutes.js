@@ -50,19 +50,16 @@
 // module.exports = router;
 
 
-const express = require("express");
-const multer = require("multer");
-const mongoose = require("mongoose");
-const path = require("path");
-const Join = require("../models/JoinEntry");
+import express from "express";
+import multer from "multer";
+import mongoose from "mongoose";
+import path from "path";
+import Join from "../models/JoinEntry.js";
 
 const router = express.Router();
 
-// Set up multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Make sure this folder exists
-  },
+  destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => {
     const uniqueName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
     cb(null, uniqueName);
@@ -71,26 +68,22 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // max 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /pdf|ppt|pptx/;
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.test(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only PDF or PPT/PPTX files allowed"));
-    }
+    if (allowedTypes.test(ext)) cb(null, true);
+    else cb(new Error("Only PDF or PPT/PPTX files allowed"));
   },
 });
 
-// POST - Submit partnership application
+// Submit form
 router.post("/", upload.single("proposalFile"), async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      console.warn("⚠️ MongoDB not connected during form submission");
       return res.status(200).json({
-        message: "Application submitted successfully (Database not available).",
-        warning: "Database not available. Application not persisted.",
+        message: "Application submitted (database not connected).",
+        warning: "Form not saved in database.",
       });
     }
 
@@ -128,9 +121,7 @@ router.post("/", upload.single("proposalFile"), async (req, res) => {
       services,
       yearsInOperation,
       partnershipReason,
-      partnershipType: Array.isArray(partnershipType)
-        ? partnershipType
-        : [partnershipType],
+      partnershipType: Array.isArray(partnershipType) ? partnershipType : [partnershipType],
       otherPartnershipType,
       targetAudience,
       collaborationVision,
@@ -142,28 +133,27 @@ router.post("/", upload.single("proposalFile"), async (req, res) => {
     const saved = await newEntry.save();
     res.status(201).json(saved);
   } catch (err) {
-    console.error("❌ Error saving form:", err);
+    console.error("Error saving form:", err);
     res.status(200).json({
-      message: "Application submitted successfully.",
-      warning: "Database operation failed. Application may not be persisted.",
+      message: "Application submitted.",
+      warning: "Database error occurred.",
     });
   }
 });
 
-// GET - Fetch all partner applications
+// Get all entries
 router.get("/", async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      console.warn("⚠️ MongoDB not connected while fetching entries");
       return res.status(200).json([]);
     }
 
     const entries = await Join.find().sort({ createdAt: -1 });
     res.status(200).json(entries);
   } catch (err) {
-    console.error("❌ Error fetching entries:", err);
+    console.error("Error fetching entries:", err);
     res.status(200).json([]);
   }
 });
 
-module.exports = router;
+export default joinRouter;
