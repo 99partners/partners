@@ -87,46 +87,37 @@ router.post("/", upload.single("proposalFile"), async (req, res) => {
       });
     }
 
-    const {
-      fullName,
-      company,
-      designation,
-      email,
-      phone,
-      website,
-      businessType,
-      otherBusinessType,
-      businessDescription,
-      services,
-      yearsInOperation,
-      partnershipReason,
-      partnershipType,
-      otherPartnershipType,
-      targetAudience,
-      collaborationVision,
-      comments,
-      agreeTerms,
-    } = req.body;
+    // Parse partnershipType as array (multer puts repeated fields as array, single as string)
+    let partnershipType = req.body.partnershipType;
+    if (typeof partnershipType === "string") {
+      partnershipType = [partnershipType];
+    } else if (!Array.isArray(partnershipType)) {
+      partnershipType = [];
+    }
 
+    // Parse agreeTerms as boolean
+    const agreeTerms = req.body.agreeTerms === "true" || req.body.agreeTerms === true;
+
+    // Create new entry with all fields from req.body
     const newEntry = new Join({
-      fullName,
-      company,
-      designation,
-      email,
-      phone,
-      website,
-      businessType,
-      otherBusinessType,
-      businessDescription,
-      services,
-      yearsInOperation,
-      partnershipReason,
-      partnershipType: Array.isArray(partnershipType) ? partnershipType : [partnershipType],
-      otherPartnershipType,
-      targetAudience,
-      collaborationVision,
-      comments,
-      agreeTerms: agreeTerms === "true" || agreeTerms === true,
+      fullName: req.body.fullName,
+      company: req.body.company,
+      designation: req.body.designation,
+      email: req.body.email,
+      phone: req.body.phone,
+      website: req.body.website,
+      businessType: req.body.businessType,
+      otherBusinessType: req.body.otherBusinessType,
+      businessDescription: req.body.businessDescription,
+      services: req.body.services,
+      yearsInOperation: req.body.yearsInOperation,
+      partnershipReason: req.body.partnershipReason,
+      partnershipType,
+      otherPartnershipType: req.body.otherPartnershipType,
+      targetAudience: req.body.targetAudience,
+      collaborationVision: req.body.collaborationVision,
+      comments: req.body.comments,
+      agreeTerms,
       proposalFile: req.file?.filename || null,
     });
 
