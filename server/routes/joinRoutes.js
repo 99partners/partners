@@ -147,4 +147,49 @@ router.get("/", async (req, res) => {
   }
 });
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+
+  // Make sure 'data' is defined and contains all form fields
+  for (const key in data) {
+    if (key === "partnershipType") {
+      data[key].forEach((item) => formData.append("partnershipType", item));
+    } else {
+      formData.append(key, data[key]);
+    }
+  }
+
+  if (proposalFile) {
+    formData.append("proposalFile", proposalFile);
+  }
+
+  // Now send formData in your fetch/axios call
+  await fetch("/api/join", {
+    method: "POST",
+    body: formData,
+  });
+};
+
+const [data, setData] = useState({
+  fullName: "",
+  company: "",
+  designation: "",
+  email: "",
+  phone: "",
+  website: "",
+  businessType: "",
+  otherBusinessType: "",
+  businessDescription: "",
+  services: "",
+  yearsInOperation: "",
+  partnershipReason: "",
+  partnershipType: [],
+  otherPartnershipType: "",
+  targetAudience: "",
+  collaborationVision: "",
+  comments: "",
+  agreeTerms: false,
+});
+
 export default joinRouter;
