@@ -250,7 +250,7 @@ const Join = () => {
               </button>
             </div>
           </form>
-        </Card>
+        </div>
       </main>
 
       <Footer />
