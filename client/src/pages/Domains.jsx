@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
-import { ShoppingCart, Laptop, DollarSign, Heart } from "lucide-react";
+import { ShoppingCart, Laptop, IndianRupee, Heart } from "lucide-react";
 
 const Domains = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -49,7 +49,7 @@ const Domains = () => {
     },
     {
       id: "financial-services",
-      icon: DollarSign,
+      icon: IndianRupee,
       title: "Financial Services",
       domain: "99finserv.com",
       color: "purple",
