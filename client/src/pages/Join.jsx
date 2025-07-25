@@ -1,6 +1,14 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Join = () => {
   const [data, setData] = useState({
@@ -9,11 +17,17 @@ const Join = () => {
     company: "",
     email: "",
     website: "",
+
+    // Section 2: Business Information
     businessType: "",
     goal: "",
     targetAudience: "",
     description: "",
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +36,9 @@ const Join = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+    setIsSubmitting(true);
 
     try {
       const res = await fetch("https://api.99partners.in/api/join", {
@@ -55,6 +72,23 @@ const Join = () => {
       alert("Something went wrong. Please try again.");
     }
   };
+
+  const businessTypes = [
+    "Digital Commerce",
+    "IT & Marketing Services",
+    "Financial Services",
+    "Spiritual Ecosystem",
+    "Other"
+  ];
+
+  const partnershipTypes = [
+    "Co-Branding",
+    "Distribution/Reselling",
+    "Marketing Collaboration",
+    "Technology Integration",
+    "Investment",
+    "Other"
+  ];
 
   return (
     <div className="min-h-screen bg-background">
