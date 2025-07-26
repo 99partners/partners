@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
   define: {
     'process.env.VITE_API_BASE_URL': JSON.stringify(
       mode === 'development' 
-        ? 'http://localhost:5050' 
+        ? 'http://localhost:4000' 
         : 'https://api.99partners.in'
     ),
   },
