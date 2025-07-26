@@ -4,7 +4,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const JoinEntry = require("../models/JoinEntry");
+const JoinEntry = require("../models/JoinEntry.js");
 const mongoose = require("mongoose");
 
 // Configure multer for file uploads
