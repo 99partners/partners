@@ -4,7 +4,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const Join = require("../models/JoinEntry");
+const JoinEntry = require("../models/JoinEntry");
 const mongoose = require("mongoose");
 
 // Configure multer for file uploads
@@ -70,7 +70,7 @@ router.post("/", upload.single('businessProposal'), async (req, res) => {
       entryData.consentToTerms = entryData.consentToTerms.toLowerCase() === 'true';
     }
 
-    const newEntry = new Join(entryData);
+    const newEntry = new JoinEntry(entryData);
     const saved = await newEntry.save();
     res.status(201).json(saved);
   } catch (err) {
@@ -94,7 +94,7 @@ router.get("/", async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const partners = await Join.find();
+    const partners = await JoinEntry.find();
     res.status(200).json(partners);
   } catch (err) {
     console.error("❌ Error fetching join entries:", err);
