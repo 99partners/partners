@@ -10,21 +10,42 @@ router.post("/", async (req, res) => {
     // Check if MongoDB is connected
     if (mongoose.connection.readyState !== 1) {
       console.log("⚠️  MongoDB not connected for join form submission");
-      return res.status(200).json({ 
-        message: "Application submitted successfully (Database not available).",
-        warning: "Database connection not available. Application not persisted."
+      return res.status(503).json({ 
+        error: "Database service is currently unavailable. Please try again later."
       });
+    }
+
+    // Validate required fields
+    const requiredFields = [
+      'name', 'company', 'designation', 'email', 'phone',
+      'businessType', 'businessDescription', 'productsServices',
+      'yearsInOperation', 'partnershipReason', 'partnershipType',
+      'targetAudience', 'collaborationVision', 'consentToTerms'
+    ];
+
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(400).json({
+          error: `${field} is required`
+        });
+      }
     }
 
     const newEntry = new Join(req.body);
     const saved = await newEntry.save();
-    res.status(201).json(saved);
+    res.status(201).json({
+      message: "Application submitted successfully",
+      data: saved
+    });
   } catch (err) {
     console.error("❌ Error saving join entry:", err);
-    // Return success even on database error for better UX
-    res.status(200).json({ 
-      message: "Application submitted successfully.",
-      warning: "Database operation failed. Application may not be persisted."
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({
+        error: "Invalid form data. Please check your inputs."
+      });
+    }
+    res.status(500).json({ 
+      error: "An error occurred while processing your application. Please try again."
     });
   }
 });

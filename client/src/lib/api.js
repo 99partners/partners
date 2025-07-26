@@ -1,5 +1,5 @@
 // API configuration
-export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.99partners.in';
+export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
 // Debug logging (only in development)
 if (process.env.NODE_ENV === 'development') {
@@ -24,4 +24,4 @@ export const API_ENDPOINTS = {
   users: buildApiUrl('/api/users'),
   admin: buildApiUrl('/api/admin'),
   protected: buildApiUrl('/api/protected'),
-}; 
+};

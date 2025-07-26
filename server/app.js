@@ -13,7 +13,9 @@ const app = express();
 // ✅ Load Environment Variables
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-const ALLOWED_ORIGIN = "https://99partners.in"; // Only allow this origin
+const ALLOWED_ORIGIN = process.env.NODE_ENV === 'production' 
+  ? "https://99partners.in" 
+  : "http://localhost:5173"; // Allow development server origin
 
 console.log("Environment Variables Loaded:", {
   PORT,

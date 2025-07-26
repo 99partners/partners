@@ -87,14 +87,14 @@ const Join = () => {
     }
 
     try {
-      const res = await axios.post(API_ENDPOINTS.join, formData, {
+      const res = await axios.post(API_ENDPOINTS.join, data, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
-        timeout: 60000, // 60 seconds timeout for file uploads
+        timeout: 60000, // 60 seconds timeout
       });
       
-      if (res.status === 201) {
+      if (res.status === 201 || res.status === 200) {
         alert("Thank you! We have received your application.");
         // Reset form
         setData({
@@ -128,18 +128,13 @@ const Join = () => {
       // Handle different error scenarios
       if (error.response) {
         // Server responded with an error status
-        switch (error.response.status) {
-          case 502:
-            setError("Server is temporarily unavailable. Please try again in a few minutes.");
-            break;
-          case 503:
-            setError("Database service is currently unavailable. Please try again later.");
-            break;
-          case 413:
-            setError("File size is too large. Please upload a smaller file (max 10MB).");
-            break;
-          default:
-            setError(error.response.data?.error || "Failed to submit application. Please try again.");
+        const errorMessage = error.response.data?.error || "Failed to submit application. Please try again.";
+        setError(errorMessage);
+        
+        // Scroll to error message
+        const errorElement = document.querySelector('.bg-destructive\/15');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       } else if (error.request) {
         // Request was made but no response received
