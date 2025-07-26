@@ -40,7 +40,7 @@ const upload = multer({
 });
 
 // POST - Submit join form with file upload
-router.post("/", upload.single('businessProposal'), async (req, res) => {
+router.post("/join", upload.single('businessProposal'), async (req, res) => {
   try {
     // Check if MongoDB is connected
     if (mongoose.connection.readyState !== 1) {
