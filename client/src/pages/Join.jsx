@@ -38,8 +38,41 @@ const Join = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    if (name === 'phone') {
+      // Only allow numbers and limit to 10 digits
+      const numbersOnly = value.replace(/[^0-9]/g, '').slice(0, 10);
+      setData(prev => ({ ...prev, [name]: numbersOnly }));
+      if (numbersOnly.length === 10 && !validatePhone(numbersOnly)) {
+        setError('Please enter a valid 10-digit phone number');
+      } else {
+        setError('');
+      }
+      return;
+    }
+
+    if (name === 'email') {
+      setData(prev => ({ ...prev, [name]: value }));
+      if (value && !validateEmail(value)) {
+        setError('Please enter a valid email address');
+      } else {
+        setError('');
+      }
+      return;
+    }
+
     setData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -72,6 +105,16 @@ const Join = () => {
 
     if (!data.consentToTerms) {
       setError("Please agree to the terms and conditions");
+      return;
+    }
+
+    if (!validateEmail(data.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!validatePhone(data.phone)) {
+      setError("Please enter a valid 10-digit phone number");
       return;
     }
 
@@ -225,9 +268,13 @@ const Join = () => {
                     value={data.email}
                     onChange={handleChange}
                     required
+                    pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
                     className="w-full mt-1 p-3 border rounded-lg bg-background"
                     placeholder="your@email.com"
                   />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Please enter a valid email address (e.g., name@example.com)
+                  </p>
                 </div>
               </div>
 
@@ -242,9 +289,14 @@ const Join = () => {
                     value={data.phone}
                     onChange={handleChange}
                     required
+                    pattern="[0-9]{10}"
+                    maxLength="10"
                     className="w-full mt-1 p-3 border rounded-lg bg-background"
-                    placeholder="Your contact number"
+                    placeholder="Enter 10-digit phone number"
                   />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Please enter a 10-digit phone number without spaces or special characters
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-card-foreground">
