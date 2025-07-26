@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
-import { API_ENDPOINTS } from "@/lib/api";
+import axios from "axios";
 
 const Join = () => {
   const [data, setData] = useState({
@@ -86,14 +86,13 @@ const Join = () => {
     }
 
     try {
-      const res = await fetch(API_ENDPOINTS.join, {
-        method: "POST",
-        body: formData,
+      const res = await axios.post("https://api.99partners.in/api/join", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      const responseData = await res.json();
-
-      if (res.ok) {
+      
+      if (res.status === 201) {
         alert("Thank you! We have received your application.");
         // Reset form
         setData({
@@ -133,12 +132,12 @@ const Join = () => {
             setError("File size is too large. Please upload a smaller file (max 10MB).");
             break;
           default:
-            setError(responseData.error || "Failed to submit application. Please try again.");
+            setError(res.data.error || "Failed to submit application. Please try again.");
         }
         console.error("Server error:", {
           status: res.status,
           statusText: res.statusText,
-          response: responseData
+          response: res.data
         });
       }
     } catch (error) {

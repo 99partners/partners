@@ -187,12 +187,12 @@ router.get("/", async (req, res) => {
     }
 
     const partners = await Join.find();
-    res.status(200).json(partners);
+    res.json(partners);
   } catch (err) {
     console.error("❌ Error fetching join entries:", err);
-    res.status(500).json({ 
+    res.status(400).json({ 
       message: "Failed to fetch entries",
-      error: err.message 
+      error: err.message
     });
   }
 });
