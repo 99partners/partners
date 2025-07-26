@@ -11,33 +11,19 @@ const { OAuth2Client } = require("google-auth-library");
 const app = express();
 
 // ✅ Load Environment Variables
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
-const ALLOWED_ORIGINS = [
-  "https://99partners.in",
-  "http://localhost:5173", // Vite default dev server
-  "http://localhost:3000",  // Common React dev server
-  "http://localhost:4000"   // Additional local development port
-];
+const ALLOWED_ORIGIN = "https://99partners.in"; // Only allow this origin
 
 console.log("Environment Variables Loaded:", {
   PORT,
   NODE_ENV: process.env.NODE_ENV,
-  ALLOWED_ORIGINS
+  ALLOWED_ORIGIN
 });
 
 // ✅ Strict CORS Configuration
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (ALLOWED_ORIGINS.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ALLOWED_ORIGIN,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -61,98 +47,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
-// Request logging middleware
-app.use((req, res, next) => {
-  const start = Date.now();
-  
-  // Log request
-  console.log(`📥 ${req.method} ${req.originalUrl}`, {
-    body: req.body,
-    query: req.query,
-    headers: {
-      'content-type': req.headers['content-type'],
-      'content-length': req.headers['content-length'],
-      'user-agent': req.headers['user-agent']
-    }
-  });
-
-  // Log response
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`📤 ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
-  });
-
-  next();
-});
-
-// Add error handling for JSON parsing
-app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    console.error('❌ JSON Parse Error:', err.message);
-    return res.status(400).json({ 
-      message: 'Invalid JSON payload',
-      error: err.message 
-    });
-  }
-  next(err);
-});
-
-// Add timeout handling
-app.use((req, res, next) => {
-  // Set timeout to 30 seconds
-  req.setTimeout(30000, () => {
-    console.error('❌ Request timeout:', req.method, req.originalUrl);
-    res.status(504).json({ 
-      message: 'Request timeout',
-      error: 'The request took too long to process' 
-    });
-  });
-  next();
-});
-
 // MongoDB Connection
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-})
-.then(() => {
-  console.log("✅ MongoDB connected:", MONGO_URI);
-})
-.catch((err) => {
-  console.error("❌ MongoDB connection error:", {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    state: mongoose.connection.readyState
-  });
-  // Don't crash the server on connection error
-  // Instead, requests will return 503 when DB is not connected
-});
-
-// Handle MongoDB connection events
-mongoose.connection.on('connected', () => {
-  console.log('✅ MongoDB connection established');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('❌ MongoDB connection error:', {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    state: mongoose.connection.readyState
-  });
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('⚠️ MongoDB disconnected');
-});
-
-process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  process.exit(0);
-});
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected:", MONGO_URI))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Google OAuth Setup
 const googleClient = new OAuth2Client(
@@ -253,5 +151,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGINS.join(', ')}`);
+  console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGIN}`);
 });
