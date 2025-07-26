@@ -11,8 +11,8 @@ const { OAuth2Client } = require("google-auth-library");
 const app = express();
 
 // ✅ Load Environment Variables
-const PORT = process.env.PORT || 5050;
-const MONGO_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/blogManagement";
+const PORT = process.env.PORT || 4000;
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
 const ALLOWED_ORIGINS = [
   "https://99partners.in",
   "http://localhost:5173", // Vite default dev server
