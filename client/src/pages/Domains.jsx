@@ -136,17 +136,17 @@ const Domains = () => {
         <meta name="twitter:image" content="https://www.99partners.com/images/twitter-card-image.jpg" />
         <meta name="keywords" content="99Partners, domains, digital commerce, ecommerce, IT services, financial advisory, spiritual wellness, AI, business consulting, SME loans, yoga, business partnerships" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-900 overflow-x-hidden">
         <Header />
         <main className="pt-20">
           {/* Hero Section */}
           <section className="py-20">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto text-center space-y-6">
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-white fade-in-up">
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-white opacity-0 fade-in-up">
                   Business <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Domains</span>
                 </h1>
-                <p className="text-xl text-muted-foreground dark:text-neutral-300 fade-in-up stagger-1">
+                <p className="text-xl text-muted-foreground dark:text-neutral-300 opacity-0 fade-in-up stagger-1">
                   Explore our comprehensive portfolio across four strategic business verticals
                 </p>
               </div>
@@ -156,7 +156,7 @@ const Domains = () => {
           {/* Tab Navigation */}
           <section className="py-16">
             <div className="container mx-auto px-4">
-              <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <div className="flex flex-wrap justify-center gap-4 mb-12 opacity-0 fade-in-up stagger-2">
                 {domains.map((domain, index) => {
                   const Icon = domain.icon;
                   const active = activeTab === index;
@@ -190,8 +190,8 @@ const Domains = () => {
                   if (activeTab !== index) return null;
                   const Icon = domain.icon;
                   return (
-                    <div key={index} className="space-y-8">
-                      <div className={`bg-card border rounded-2xl p-8 glass fade-in-up`}>
+                    <div key={index} className="space-y-8 opacity-0 fade-in-up stagger-3">
+                      <div className={`bg-card border rounded-2xl p-8 glass`}>
                         <div className="flex items-center gap-4 mb-6">
                           <div className={`w-16 h-16 rounded-xl flex items-center justify-center ${getColorClasses(domain.color)}`}>
                             <Icon className="w-8 h-8" />
