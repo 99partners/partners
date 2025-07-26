@@ -75,7 +75,7 @@ const Domains = () => {
       domain: "harmonyhights.com",
       color: "orange",
       overview:
-        "Holistic wellness solutions encompassing ancient wisdom and modern practices to promote physical, mental, and spiritual well-being.",
+        "Holistic wellness solutions encompassing ancient wisdom and modern practices to promote physical, mental, and spiritual well-being. ",
       services: [
         "Yoga and meditation programs",
         "Panchkarma treatments",
