@@ -60,10 +60,98 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  
+  // Log request
+  console.log(`📥 ${req.method} ${req.originalUrl}`, {
+    body: req.body,
+    query: req.query,
+    headers: {
+      'content-type': req.headers['content-type'],
+      'content-length': req.headers['content-length'],
+      'user-agent': req.headers['user-agent']
+    }
+  });
+
+  // Log response
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`📤 ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+  });
+
+  next();
+});
+
+// Add error handling for JSON parsing
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('❌ JSON Parse Error:', err.message);
+    return res.status(400).json({ 
+      message: 'Invalid JSON payload',
+      error: err.message 
+    });
+  }
+  next(err);
+});
+
+// Add timeout handling
+app.use((req, res, next) => {
+  // Set timeout to 30 seconds
+  req.setTimeout(30000, () => {
+    console.error('❌ Request timeout:', req.method, req.originalUrl);
+    res.status(504).json({ 
+      message: 'Request timeout',
+      error: 'The request took too long to process' 
+    });
+  });
+  next();
+});
+
 // MongoDB Connection
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected:", MONGO_URI))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+})
+.then(() => {
+  console.log("✅ MongoDB connected:", MONGO_URI);
+})
+.catch((err) => {
+  console.error("❌ MongoDB connection error:", {
+    name: err.name,
+    message: err.message,
+    code: err.code,
+    state: mongoose.connection.readyState
+  });
+  // Don't crash the server on connection error
+  // Instead, requests will return 503 when DB is not connected
+});
+
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('✅ MongoDB connection established');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', {
+    name: err.name,
+    message: err.message,
+    code: err.code,
+    state: mongoose.connection.readyState
+  });
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ MongoDB disconnected');
+});
+
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  process.exit(0);
+});
 
 // Google OAuth Setup
 const googleClient = new OAuth2Client(

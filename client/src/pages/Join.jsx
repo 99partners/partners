@@ -88,11 +88,14 @@ const Join = () => {
     try {
       const res = await fetch(API_ENDPOINTS.join, {
         method: "POST",
-        body: formData, // FormData automatically sets the correct Content-Type
+        body: formData,
       });
+
+      const responseData = await res.json();
 
       if (res.ok) {
         alert("Thank you! We have received your application.");
+        // Reset form
         setData({
           name: "",
           company: "",
@@ -118,12 +121,29 @@ const Join = () => {
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput) fileInput.value = "";
       } else {
-        const errData = await res.json();
-        setError(errData.error || "Failed to submit application. Please try again.");
+        // Handle different error status codes
+        switch (res.status) {
+          case 502:
+            setError("Server is temporarily unavailable. Please try again in a few minutes.");
+            break;
+          case 503:
+            setError("Database service is currently unavailable. Please try again later.");
+            break;
+          case 413:
+            setError("File size is too large. Please upload a smaller file (max 10MB).");
+            break;
+          default:
+            setError(responseData.error || "Failed to submit application. Please try again.");
+        }
+        console.error("Server error:", {
+          status: res.status,
+          statusText: res.statusText,
+          response: responseData
+        });
       }
     } catch (error) {
       console.error("Network error:", error);
-      setError("Something went wrong. Please try again.");
+      setError("Unable to connect to the server. Please check your internet connection and try again.");
     }
   };
 
