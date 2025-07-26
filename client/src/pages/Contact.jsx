@@ -10,7 +10,32 @@ import {
 } from "lucide-react";
 
 const Contact = () => {
-  
+  const contactMethods = [
+    {
+      icon: Mail,
+      title: "Email Us",
+      description: "Get in touch via email for detailed inquiries",
+      contact: "hello@99partners.com",
+      action: "mailto:hello@99partners.com",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: MessageSquare,
+      title: "Live Chat",
+      description: "Get instant support through our chat system",
+      contact: "Available 24/7",
+      action: "#",
+      color: "from-purple-500 to-violet-500",
+    },
+    {
+      icon: Headphones,
+      title: "Support Center",
+      description: "Access our comprehensive help resources",
+      contact: "Help Center",
+      action: "#",
+      color: "from-orange-500 to-pink-500",
+    },
+  ];
 
   const offices = [
     {
@@ -20,7 +45,7 @@ const Contact = () => {
       mapLink: "https://maps.google.com/?q=Titanium+City+Center,+Satellite,+Ahmedabad,+380015",
     },
     {
-      city: "USA",
+      city: "Dover",
       address: "8 The Green STE B, Dover, Delaware 19901",
       email: "dover@99partners.com",
       mapLink: "https://maps.google.com/?q=8+The+Green+STE+B,+Dover,+Delaware+19901",
@@ -62,7 +87,40 @@ const Contact = () => {
         </section>
 
         {/* Contact Methods */}
-       
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              {contactMethods.slice(0, 3).map((method, index) => {
+                const Icon = method.icon;
+                return (
+                  <div
+                    key={index}
+                    className="glass rounded-xl p-6 text-center hover-lift hover-glow fade-in-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div
+                      className={`w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-r ${method.color} p-3 shadow-lg`}
+                    >
+                      <Icon className="w-full h-full text-white" />
+                    </div>
+                    <h3 className="font-bold text-foreground dark:text-white mb-2">
+                      {method.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground dark:text-neutral-300 mb-3">
+                      {method.description}
+                    </p>
+                    <a
+                      href={method.action}
+                      className="text-primary hover:text-primary/80 font-medium transition-colors"
+                    >
+                      {method.contact}
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
 
         {/* Main Contact Section */}
         <section className="py-16">
@@ -150,7 +208,46 @@ const Contact = () => {
           </div>
         </section>
 
-       
+        {/* FAQ Quick Links */}
+        <section className="py-16 bg-gradient-to-r from-primary/5 to-purple-500/5 dark:from-gray-800 dark:to-gray-900">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h3 className="text-2xl font-bold text-foreground dark:text-white mb-8 fade-in-up">
+                Frequently Asked Questions
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="glass rounded-xl p-6 hover-lift fade-in-up stagger-1">
+                  <h4 className="font-semibold text-foreground dark:text-white mb-2">
+                    Partnership Process
+                  </h4>
+                  <p className="text-sm text-muted-foreground dark:text-neutral-300">
+                    Learn about our partnership onboarding process and
+                    requirements.
+                  </p>
+                </div>
+
+                <div className="glass rounded-xl p-6 hover-lift fade-in-up stagger-2">
+                  <h4 className="font-semibold text-foreground dark:text-white mb-2">
+                    Service Domains
+                  </h4>
+                  <p className="text-sm text-muted-foreground dark:text-neutral-300">
+                    Explore our four business verticals and service offerings.
+                  </p>
+                </div>
+
+                <div className="glass rounded-xl p-6 hover-lift fade-in-up stagger-3">
+                  <h4 className="font-semibold text-foreground dark:text-white mb-2">
+                    Support & Resources
+                  </h4>
+                  <p className="text-sm text-muted-foreground dark:text-neutral-300">
+                    Access our comprehensive support center and resources.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

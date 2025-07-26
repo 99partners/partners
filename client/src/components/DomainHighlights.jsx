@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   ShoppingCart,
   Laptop,
-  IndianRupee,
+  DollarSign,
   Heart,
   ArrowRight,
 } from "lucide-react";
@@ -38,7 +38,7 @@ const DomainHighlights = () => {
       delay: "0.2s",
     },
     {
-      icon: IndianRupee,
+      icon: DollarSign,
       title: "Financial Services",
       description:
         "SME loan facilitation and tailored funding support solutions for scalable business growth.",
