@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
-import { API_ENDPOINTS } from "@/lib/api";
+import axios from "axios";
 
 const Join = () => {
   const [data, setData] = useState({
