@@ -1,42 +1,24 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const joinSchema = new mongoose.Schema({
-  // Section 1: Contact Information
-  name: { type: String, required: true },
-  company: { type: String, required: true },
-  designation: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  website: String,
-
-  // Section 2: Business Information
-  businessType: { type: String, required: true },
-  otherBusinessType: String,
-  businessDescription: { type: String, required: true, maxLength: 2000 }, // 200 words ≈ 2000 chars
-  productsServices: { type: String, required: true },
-  yearsInOperation: { 
-    type: String, 
-    required: true,
-    enum: ['Start-Up (Less than 2 years)', '2-5 Years', 'More than 5 Years']
-  },
-
-  // Section 3: Partnership Goals
-  partnershipReason: { type: String, required: true },
-  partnershipType: { type: String, required: true },
-  otherPartnershipType: String,
-  targetAudience: { type: String, required: true },
-  collaborationVision: { type: String, required: true, maxLength: 3000 }, // 300 words ≈ 3000 chars
-
-  // Section 4: Supporting Information
+const joinEntrySchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  phone: String,
+  businessName: String,
+  businessWebsite: String,
+  businessDescription: String,
+  partnershipGoals: String,
+  consentToTerms: Boolean,
   businessProposalFile: {
     filename: String,
     path: String,
-    originalName: String
+    originalName: String,
   },
-  additionalComments: String,
+  submittedAt: {
+    type: Date,
+    default: Date.now,
+  }
+});
 
-  // Consent
-  consentToTerms: { type: Boolean, required: true }
-}, { timestamps: true });
+module.exports = mongoose.model("JoinEntry", joinEntrySchema);
 
-module.exports = mongoose.model('JoinEntry', joinSchema);
