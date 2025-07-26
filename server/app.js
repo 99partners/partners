@@ -12,11 +12,12 @@ const app = express();
 
 // ✅ Load Environment Variables
 const PORT = process.env.PORT || 5050;
-const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/blogManagement";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/blogManagement";
 const ALLOWED_ORIGINS = [
   "https://99partners.in",
   "http://localhost:5173", // Vite default dev server
-  "http://localhost:3000"  // Common React dev server
+  "http://localhost:3000",  // Common React dev server
+  "http://localhost:4000"   // Additional local development port
 ];
 
 console.log("Environment Variables Loaded:", {
