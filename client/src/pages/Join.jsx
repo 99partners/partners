@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
 
 const Join = () => {
   const [data, setData] = useState({
@@ -86,10 +87,11 @@ const Join = () => {
     }
 
     try {
-      const res = await axios.post("https://api.99partners.in/api/join", formData, {
+      const res = await axios.post(API_ENDPOINTS.join, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        timeout: 60000, // 60 seconds timeout for file uploads
       });
       
       if (res.status === 201) {
@@ -119,9 +121,14 @@ const Join = () => {
         // Reset file input
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput) fileInput.value = "";
-      } else {
-        // Handle different error status codes
-        switch (res.status) {
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      
+      // Handle different error scenarios
+      if (error.response) {
+        // Server responded with an error status
+        switch (error.response.status) {
           case 502:
             setError("Server is temporarily unavailable. Please try again in a few minutes.");
             break;
@@ -132,17 +139,15 @@ const Join = () => {
             setError("File size is too large. Please upload a smaller file (max 10MB).");
             break;
           default:
-            setError(res.data.error || "Failed to submit application. Please try again.");
+            setError(error.response.data?.error || "Failed to submit application. Please try again.");
         }
-        console.error("Server error:", {
-          status: res.status,
-          statusText: res.statusText,
-          response: res.data
-        });
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("Unable to connect to the server. Please check your internet connection and try again.");
+      } else {
+        // Something else happened while setting up the request
+        setError("An error occurred while submitting the form. Please try again.");
       }
-    } catch (error) {
-      console.error("Network error:", error);
-      setError("Unable to connect to the server. Please check your internet connection and try again.");
     }
   };
 

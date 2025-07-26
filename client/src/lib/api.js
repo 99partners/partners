@@ -1,27 +1,23 @@
 // API configuration
-export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.99partners.in';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
 
-// Debug logging (only in development)
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 API Configuration:', {
-    VITE_API_BASE_URL: process.env.VITE_API_BASE_URL,
-    API_BASE_URL: API_BASE_URL,
-    NODE_ENV: process.env.NODE_ENV
-  });
-}
-
-// Helper function to build API URLs
-export const buildApiUrl = (endpoint) => {
-  return `${API_BASE_URL}${endpoint}`;
+// API endpoints
+export const API_ENDPOINTS = {
+  join: `${API_BASE_URL}/api/join`,
+  contact: `${API_BASE_URL}/api/contact`,
+  blogs: `${API_BASE_URL}/api/blogs`,
+  newsletter: `${API_BASE_URL}/api/newsletter`,
+  users: `${API_BASE_URL}/api/users`,
+  admin: `${API_BASE_URL}/api/admin`,
 };
 
-// Common API endpoints
-export const API_ENDPOINTS = {
-  newsletter: buildApiUrl('/api/newsletter'),
-  blogs: buildApiUrl('/api/blogs'),
-  contact: buildApiUrl('/api/contact'),
-  join: buildApiUrl('/api/join'),
-  users: buildApiUrl('/api/users'),
-  admin: buildApiUrl('/api/admin'),
-  protected: buildApiUrl('/api/protected'),
-}; 
+// Axios configuration
+export const axiosConfig = {
+  baseURL: API_BASE_URL,
+  timeout: 30000, // 30 seconds
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
+
+export default API_ENDPOINTS; 
