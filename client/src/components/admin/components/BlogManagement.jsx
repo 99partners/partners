@@ -254,8 +254,12 @@ const BlogManagement = () => {
           <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
           <input type="text" name="shortDescription" placeholder="Short Description" value={formData.shortDescription} onChange={handleChange} required />
           <div
-            style={{ padding: 0 }}
             ref={editorRef}
+            style={{
+              padding: 0,
+              '--note-editor-padding': '0 !important',
+              '--note-editable-padding': '0 !important'
+            }}
           />
           <input type="text" name="author" placeholder="Author" value={formData.author} onChange={handleChange} required />
           <input type="date" name="date" value={formData.date} onChange={handleChange} required />
