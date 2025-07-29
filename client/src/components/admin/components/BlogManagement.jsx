@@ -46,6 +46,7 @@ const BlogManagement = () => {
     if (showForm) {
       $(editorRef.current).summernote({
         height: 300,
+        padding: 0,
         callbacks: {
           onChange: function (contents) {
             setFormData((prev) => ({ ...prev, description: contents }));
@@ -253,8 +254,7 @@ const BlogManagement = () => {
           <input type="text" name="photo" placeholder="Image URL" value={formData.photo} onChange={handleChange} required />
           <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
           <input type="text" name="shortDescription" placeholder="Short Description" value={formData.shortDescription} onChange={handleChange} required />
-          {/* <div className='' ref={editorRef} /> */}
-          <div className="summernote-editor" style={{padding:0}} ref={editorRef} />
+          <div ref={editorRef} />
           <input type="text" name="author" placeholder="Author" value={formData.author} onChange={handleChange} required />
           <input type="date" name="date" value={formData.date} onChange={handleChange} required />
           <input type="text" name="tag" placeholder="Tag (e.g., React)" value={formData.tag} onChange={handleChange} required />
