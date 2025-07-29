@@ -130,7 +130,7 @@ const Join = () => {
     }
 
     try {
-      const res = await axios.post(API_ENDPOINTS.join, formData, {
+      const res = await axios.post(API_ENDPOINTS.join, data, {
         headers: {
                     "Content-Type": "application/json",
 
