@@ -11,7 +11,7 @@ const joinSchema = new mongoose.Schema({
 
   // Section 2: Business Information
   businessType: { type: String, required: true },
-  otherBusinessType: { type: String },
+  // otherBusinessType: { type: String },
   businessDescription: { type: String, required: true },
   productsServices: { type: String, required: true },
   yearsInOperation: { type: String, required: true },
@@ -19,7 +19,7 @@ const joinSchema = new mongoose.Schema({
   // Section 3: Partnership Goals
   partnershipReason: { type: String, required: true },
   partnershipType: { type: String, required: true },
-  otherPartnershipType: { type: String },
+  // otherPartnershipType: { type: String },
   targetAudience: { type: String, required: true },
   collaborationVision: { type: String, required: true },
 
