@@ -130,12 +130,7 @@ const Join = () => {
     }
 
     try {
-      const res = await axios.post(API_ENDPOINTS.join, data, {
-        headers: {
-                    "Content-Type": "application/json",
-
-          // Let axios set the Content-Type header for multipart/form-data
-        },
+      const res = await axios.post(API_ENDPOINTS.join, formData, {
         timeout: 60000, // 60 seconds timeout
       });
       

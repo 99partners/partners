@@ -61,7 +61,7 @@ const PartnerManagement = () => {
             {/* Supporting Info */}
             <p><strong>Additional Comments:</strong> {partner.additionalComments}</p>
             
-             {partner._id && (
+             {partner.file && (
               <p>
                 <strong>Business Proposal:</strong>{" "}
                 <a
