@@ -100,7 +100,15 @@ const BlogDetail = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {otherBlogs.map((item) => (
-                <BlogCard key={item._id} post={item} />
+                               <div
+                  key={item._id}
+                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="p-6">
+                    <BlogCard post={item} />
+                  </div>
+                </div>
+
               ))}
             </div>
           </div>
