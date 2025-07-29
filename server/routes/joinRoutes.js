@@ -68,29 +68,6 @@
 //   }
 // });
 
-// // ✅ NEW: GET a specific partner's business proposal
-router.get("/:id/business-proposal", async (req, res) => {
-  try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({ error: "Database service is unavailable." });
-    }
-
-    const partner = await Join.findById(req.params.id);
-
-    if (!partner || !partner.file || !partner.file.data) {
-      return res.status(404).send("Proposal not found.");
-    }
-
-    res.set("Content-Type", partner.file.contentType);
-    res.set("Content-Disposition", `attachment; filename="${partner.file.filename}"`);
-    res.send(partner.file.data);
-  } catch (err) {
-    console.error("❌ Error fetching business proposal:", err);
-    res.status(500).send("Server error while fetching the file.");
-  }
-});
-
-module.exports = router;
 
 
 // routes/joinRoutes.js
@@ -176,5 +153,29 @@ router.get("/", async (req, res) => {
     res.status(200).json([]);
   }
 });
+
+
+// // ✅ NEW: GET a specific partner's business proposal
+router.get("/:id/business-proposal", async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ error: "Database service is unavailable." });
+    }
+
+    const partner = await Join.findById(req.params.id);
+
+    if (!partner || !partner.file || !partner.file.data) {
+      return res.status(404).send("Proposal not found.");
+    }
+
+    res.set("Content-Type", partner.file.contentType);
+    res.set("Content-Disposition", `attachment; filename="${partner.file.filename}"`);
+    res.send(partner.file.data);
+  } catch (err) {
+    console.error("❌ Error fetching business proposal:", err);
+    res.status(500).send("Server error while fetching the file.");
+  }
+});
+
 
 module.exports = router;
