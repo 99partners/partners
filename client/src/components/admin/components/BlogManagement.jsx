@@ -47,7 +47,7 @@ const BlogManagement = () => {
       $(editorRef.current).summernote({
         height: 300,
         callbacks: {
-          onChange: function(contents) {
+          onChange: function (contents) {
             setFormData((prev) => ({ ...prev, description: contents }));
           }
         }
@@ -79,17 +79,17 @@ const BlogManagement = () => {
 
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
-    
+
     // Validate required fields
     const requiredFields = ['title', 'shortDescription', 'description', 'author', 'date', 'category', 'status'];
     const missingFields = requiredFields.filter(field => !formData[field]);
-    
+
     if (missingFields.length > 0) {
       console.error("❌ Missing required fields:", missingFields);
       showNotification(`Missing required fields: ${missingFields.join(', ')}`, 'error');
       return;
     }
-    
+
     try {
       console.log("🔄 Starting blog save/update operation...");
       console.log("📝 Form data:", {
@@ -114,7 +114,7 @@ const BlogManagement = () => {
 
       console.log("✅ Server response:", response.data);
       const saved = response.data;
-      
+
       // Update local state
       const updatedList = isEditing
         ? blogPosts.map((post) => (post._id === saved._id ? saved : post))
@@ -123,7 +123,7 @@ const BlogManagement = () => {
       console.log("📊 Updating local state with", updatedList.length, "blogs");
       setBlogPosts(updatedList);
       resetForm();
-      
+
       // Refresh the list from server to ensure consistency
       setTimeout(async () => {
         try {
@@ -135,7 +135,7 @@ const BlogManagement = () => {
           console.error("❌ Error refreshing blog list:", refreshError);
         }
       }, 1000);
-      
+
     } catch (error) {
       console.error("❌ Error saving blog:", error);
       console.error("❌ Error details:", error.response?.data);
@@ -224,7 +224,7 @@ const BlogManagement = () => {
       </button>
 
       {/* Debug button to check database state */}
-      <button 
+      <button
         onClick={async () => {
           try {
             const response = await axios.get('https://api.99partners.in/api/blogs/debug/state');
@@ -253,7 +253,10 @@ const BlogManagement = () => {
           <input type="text" name="photo" placeholder="Image URL" value={formData.photo} onChange={handleChange} required />
           <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
           <input type="text" name="shortDescription" placeholder="Short Description" value={formData.shortDescription} onChange={handleChange} required />
-          <div className="p-0" ref={editorRef} />
+          <div
+            style={{ padding: 0 }}
+            ref={editorRef}
+          />
           <input type="text" name="author" placeholder="Author" value={formData.author} onChange={handleChange} required />
           <input type="date" name="date" value={formData.date} onChange={handleChange} required />
           <input type="text" name="tag" placeholder="Tag (e.g., React)" value={formData.tag} onChange={handleChange} required />
