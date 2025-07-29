@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/main.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'summernote/dist/summernote-bs4.css';
+import $ from 'jquery';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+import 'summernote/dist/summernote-bs4.min.js';
 
 const BlogManagement = () => {
   const existingCategories = [
@@ -27,6 +32,7 @@ const BlogManagement = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  const editorRef = useRef(null);
 
   // ✅ Fetch all blogs (Draft + Published) for admin
   useEffect(() => {
@@ -35,6 +41,26 @@ const BlogManagement = () => {
       .then((res) => setBlogPosts(res.data))
       .catch((err) => console.error('Error fetching blogs:', err));
   }, []);
+
+  useEffect(() => {
+    if (showForm) {
+      $(editorRef.current).summernote({
+        height: 300,
+        callbacks: {
+          onChange: function(contents) {
+            setFormData((prev) => ({ ...prev, description: contents }));
+          }
+        }
+      });
+      if (isEditing) {
+        $(editorRef.current).summernote('code', formData.description);
+      }
+    } else {
+      if ($(editorRef.current).hasClass('note-editor')) {
+        $(editorRef.current).summernote('destroy');
+      }
+    }
+  }, [showForm, isEditing, formData.description]);
 
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
@@ -227,7 +253,7 @@ const BlogManagement = () => {
           <input type="text" name="photo" placeholder="Image URL" value={formData.photo} onChange={handleChange} required />
           <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
           <input type="text" name="shortDescription" placeholder="Short Description" value={formData.shortDescription} onChange={handleChange} required />
-          <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} required></textarea>
+          <div ref={editorRef} />
           <input type="text" name="author" placeholder="Author" value={formData.author} onChange={handleChange} required />
           <input type="date" name="date" value={formData.date} onChange={handleChange} required />
           <input type="text" name="tag" placeholder="Tag (e.g., React)" value={formData.tag} onChange={handleChange} required />
