@@ -111,7 +111,7 @@ router.post("/", upload.single("businessProposal"), async (req, res) => {
 
     // If file was uploaded, add it to the document
     if (req.file) {
-      entryData.file = {
+      entryData.businessProposal = {
         data: req.file.buffer,
         contentType: req.file.mimetype,
         filename: req.file.originalname,
@@ -155,7 +155,7 @@ router.get("/", async (req, res) => {
 });
 
 
-// // ✅ NEW: GET a specific partner's business proposal
+// ✅ GET a specific partner's business proposal
 router.get("/:id/business-proposal", async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -164,13 +164,13 @@ router.get("/:id/business-proposal", async (req, res) => {
 
     const partner = await Join.findById(req.params.id);
 
-    if (!partner || !partner.file || !partner.file.data) {
+    if (!partner || !partner.businessProposal || !partner.businessProposal.data) {
       return res.status(404).send("Proposal not found.");
     }
 
-    res.set("Content-Type", partner.file.contentType);
-    res.set("Content-Disposition", `attachment; filename="${partner.file.filename}"`);
-    res.send(partner.file.data);
+    res.set("Content-Type", partner.businessProposal.contentType);
+    res.set("Content-Disposition", `attachment; filename="${partner.businessProposal.filename}"`);
+    res.send(partner.businessProposal.data);
   } catch (err) {
     console.error("❌ Error fetching business proposal:", err);
     res.status(500).send("Server error while fetching the file.");
