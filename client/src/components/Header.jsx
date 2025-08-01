@@ -76,11 +76,10 @@ const Header = () => {
                   <>
                     <button
                       className={`text-sm font-medium transition-all duration-300 hover:text-primary flex items-center gap-1 h-10 px-2 ${
-                        isActive(item.path) || item.subItems.some((subItem) => isActive(subItem.path))
+                        item.subItems.some((subItem) => isActive(subItem.path))
                           ? "text-primary"
                           : "text-muted-foreground"
                       }`}
-                      onClick={() => navigate(item.path)}
                       onMouseEnter={() => setIsPartnerMenuOpen(true)}
                       onMouseLeave={() => setIsPartnerMenuOpen(false)}
                       aria-expanded={isPartnerMenuOpen}
@@ -94,9 +93,7 @@ const Header = () => {
                       />
                       <span
                         className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${
-                          isActive(item.path) || item.subItems.some((subItem) => isActive(subItem.path))
-                            ? "w-full"
-                            : ""
+                          item.subItems.some((subItem) => isActive(subItem.path)) ? "w-full" : ""
                         }`}
                       ></span>
                     </button>
@@ -203,7 +200,7 @@ const Header = () => {
                     <>
                       <button
                         className={`text-sm font-medium transition-all duration-300 hover:text-primary flex items-center gap-1 w-full text-left h-10 px-2 ${
-                          isActive(item.path) || item.subItems.some((subItem) => isActive(subItem.path))
+                          item.subItems.some((subItem) => isActive(subItem.path))
                             ? "text-primary"
                             : "text-muted-foreground"
                         }`}
