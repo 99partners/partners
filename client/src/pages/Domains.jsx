@@ -141,6 +141,7 @@ const Domains = () => {
         <meta name="keywords" content="99Partners, domains, digital commerce, ecommerce, IT services, financial advisory, spiritual wellness, AI, business consulting, SME loans, yoga, business partnerships" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-900">
+        <Header />
         <main className="pt-20">
          
           {/* Hero Section */}
