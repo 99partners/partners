@@ -3,12 +3,7 @@ import { useState, useEffect } from "react";
 import { useGoogleOneTapLogin } from "@react-oauth/google";
 import { decodeJwt } from "jose";
 import axios from "axios";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +22,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
+import WhyPartner from "./pages/Whypartner";
+import PartnershipBenefits from "./pages/PartnershipBenefits";
+import PartnershipOpportunity from "./pages/PartnershipOpportunity";
 
 // Admin Components
 import AuthLayout from "./components/admin/components/AuthLayout";
@@ -66,21 +64,21 @@ function App() {
 
       try {
         const payload = decodeJwt(credential);
-        console.log('✅ Decoded Payload:', payload);
+        console.log("✅ Decoded Payload:", payload);
 
-        const res = await axios.get('https://api.99partners.in/protected', {
+        const res = await axios.get("https://api.99partners.in/protected", {
           headers: {
             Authorization: `Bearer ${credential}`,
           },
         });
 
-        console.log('🔐 Protected route response:', res.data);
+        console.log("🔐 Protected route response:", res.data);
       } catch (error) {
-        console.error('❌ Error verifying user:', error);
+        console.error("❌ Error verifying user:", error);
       }
     },
     onError: (error) => {
-      console.error('❌ Google One Tap Error:', error);
+      console.error("❌ Google One Tap Error:", error);
     },
   });
 
@@ -114,18 +112,30 @@ function App() {
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="/faqs" element={<FAQs />} />
+            <Route path="/whypartner" element={<WhyPartner />} />
+            <Route path="/partnerbenefits" element={<PartnershipBenefits />} />
+            <Route
+              path="/partneroppotunity"
+              element={<PartnershipOpportunity />}
+            />
 
             {/* Admin Login */}
             <Route element={<AuthLayout />}>
-              <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
+              <Route
+                path="/admin/login"
+                element={<Login onLogin={handleLogin} />}
+              />
             </Route>
 
             {/* Admin Protected Routes */}
-            <Route path="/admin" element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="blogs" element={<BlogManagement />} />
