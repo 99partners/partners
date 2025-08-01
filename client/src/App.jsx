@@ -15,7 +15,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Public Pages
-import Header from "@/components/Header";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Domains from "./pages/Domains";
@@ -102,7 +101,6 @@ function App() {
       <TooltipProvider>
         <Toaster theme="dark" position="bottom-right" />
         <BrowserRouter>
-          <Header /> {/* Moved inside BrowserRouter */}
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
