@@ -14,7 +14,7 @@ const DomainHighlights = () => {
       title: "Digital Commerce",
       description:
         "ONDC integration, e-commerce solutions, and co-branding opportunities for modern businesses.",
-      backContent: ["Launch", "Manage", "Grow", "Co-Branding"],
+      backContent: ["Launch", "Manage", "Grow"],
       color: "from-green-500 to-green-500",
       darkColor: "dark:from-cyan-400 dark:to-green-500",
       bgColor: "bg-green-50 dark:bg-cyan-900/20",
