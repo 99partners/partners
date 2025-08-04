@@ -74,4 +74,47 @@ router.get("/protected", verifyGoogleToken, async (req, res, next) => {
   }
 });
 
+// Google One Tap Login endpoint
+router.post("/api/auth/google", async (req, res) => {
+  const { credential } = req.body;
+  
+  if (!credential) {
+    return res.status(400).json({ error: "No credential provided" });
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const { sub, email, name, picture } = payload;
+
+    // Create or update user in MongoDB
+    const user = await User.findOneAndUpdate(
+      { googleId: sub },
+      { 
+        email, 
+        displayName: name, 
+        photo: picture,
+        lastLogin: new Date()
+      },
+      { new: true, upsert: true }
+    );
+
+    res.json({ 
+      success: true, 
+      user,
+      message: "Successfully authenticated"
+    });
+  } catch (error) {
+    console.error("Authentication error:", error);
+    res.status(401).json({ 
+      error: "Authentication failed", 
+      message: error.message 
+    });
+  }
+});
+
 module.exports = router;

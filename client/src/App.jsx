@@ -66,15 +66,20 @@ function App() {
         const payload = decodeJwt(credential);
         console.log("✅ Decoded Payload:", payload);
 
-        const res = await axios.get("https://api.99partners.in/protected", {
-          headers: {
-            Authorization: `Bearer ${credential}`,
-          },
+        // Update the endpoint to match the server route
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google`, {
+          credential
         });
 
-        console.log("🔐 Protected route response:", res.data);
+        if (res.data.user) {
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+          setUser(res.data.user);
+          setIsAuthenticated(true);
+        }
+
+        console.log("🔐 Auth response:", res.data);
       } catch (error) {
-        console.error("❌ Error verifying user:", error);
+        console.error("❌ Error authenticating:", error);
       }
     },
     onError: (error) => {

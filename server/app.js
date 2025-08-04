@@ -29,20 +29,20 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
   optionsSuccessStatus: 200
 };
 
 // Apply CORS middleware only once
 app.use(cors(corsOptions));
 
-// Add middleware to prevent duplicate headers
-app.use((req, res, next) => {
-  // Remove any duplicate headers
-  res.removeHeader('Access-Control-Allow-Origin');
-  res.removeHeader('Access-Control-Allow-Methods');
-  res.removeHeader('Access-Control-Allow-Headers');
-  next();
-});
+// Remove this middleware as it's interfering with CORS headers
+// app.use((req, res, next) => {
+//   res.removeHeader('Access-Control-Allow-Origin');
+//   res.removeHeader('Access-Control-Allow-Methods');
+//   res.removeHeader('Access-Control-Allow-Headers');
+//   next();
+// });
 
 // Standard middleware
 app.use(express.json());
