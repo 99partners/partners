@@ -214,28 +214,80 @@ const Domains = () => {
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="bg-card border rounded-xl p-6">
-                          <h3 className="text-2xl font-bold mb-6 text-card-foreground dark:text-white">
-                            Services Offered
-                          </h3>
-                          <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Services Section - Takes 2/3 of the space */}
+                        <div className="lg:col-span-2 bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 border-2 border-gray-100 dark:border-slate-700 rounded-2xl p-8 shadow-lg">
+                          <div className="flex items-center gap-3 mb-8">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getColorClasses(domain.color)}`}>
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-card-foreground dark:text-white">
+                              Services Offered
+                            </h3>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {domain.services.map((service, serviceIndex) => (
-                              <div key={serviceIndex} className="flex items-start gap-3">
-                                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getColorClasses(domain.color, "secondary")}`}></div>
-                                <span className="text-muted-foreground dark:text-neutral-300">{service}</span>
+                              <div 
+                                key={serviceIndex} 
+                                className={`group relative bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl p-4 hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-${domain.color}-300 dark:hover:border-${domain.color}-500`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className={`w-3 h-3 rounded-full mt-1.5 flex-shrink-0 ${getColorClasses(domain.color, "secondary")} group-hover:scale-110 transition-transform duration-300`}></div>
+                                  <span className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                                    {service}
+                                  </span>
+                                </div>
+                                {/* Subtle gradient overlay on hover */}
+                                <div className={`absolute inset-0 bg-gradient-to-r ${
+                                  domain.color === 'green' ? 'from-green-50 to-emerald-50' :
+                                  domain.color === 'blue' ? 'from-blue-50 to-indigo-50' :
+                                  domain.color === 'purple' ? 'from-purple-50 to-fuchsia-50' :
+                                  'from-orange-50 to-amber-50'
+                                } dark:from-slate-700 dark:to-slate-600 opacity-0 group-hover:opacity-30 rounded-xl transition-opacity duration-300 pointer-events-none`}></div>
                               </div>
                             ))}
                           </div>
                         </div>
 
-                        <div className="bg-card border rounded-xl p-6 h-full flex items-center justify-center">
-                          <img
-                            src={domain.image}
-                            alt={domain.title}
-                            className="w-full h-auto max-h-96 object-contain"
-                            onError={() => console.log(`Failed to load image: ${domain.image}`)}
-                          />
+                        {/* Image Section - Takes 1/3 of the space with better positioning */}
+                        <div className="lg:col-span-1 relative">
+                          <div className="sticky top-8">
+                            <div className={`bg-gradient-to-br ${
+                              domain.color === 'green' ? 'from-green-100 to-emerald-200' :
+                              domain.color === 'blue' ? 'from-blue-100 to-indigo-200' :
+                              domain.color === 'purple' ? 'from-purple-100 to-fuchsia-200' :
+                              'from-orange-100 to-amber-200'
+                            } dark:from-slate-700 dark:to-slate-800 border-2 ${
+                              domain.color === 'green' ? 'border-green-200' :
+                              domain.color === 'blue' ? 'border-blue-200' :
+                              domain.color === 'purple' ? 'border-purple-200' :
+                              'border-orange-200'
+                            } dark:border-slate-600 rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]`}>
+                              <div className="relative overflow-hidden rounded-xl">
+                                <img
+                                  src={domain.image}
+                                  alt={domain.title}
+                                  className="w-full h-auto object-cover transition-transform duration-700 hover:scale-105"
+                                  onError={() => console.log(`Failed to load image: ${domain.image}`)}
+                                />
+                                {/* Subtle overlay for better image integration */}
+                                <div className={`absolute inset-0 bg-gradient-to-t ${
+                                  domain.color === 'green' ? 'from-green-900/10 to-transparent' :
+                                  domain.color === 'blue' ? 'from-blue-900/10 to-transparent' :
+                                  domain.color === 'purple' ? 'from-purple-900/10 to-transparent' :
+                                  'from-orange-900/10 to-transparent'
+                                } opacity-0 hover:opacity-100 transition-opacity duration-300`}></div>
+                              </div>
+                              
+                              {/* Domain badge */}
+                              <div className="mt-4 text-center">
+                                <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getColorClasses(domain.color)} shadow-sm`}>
+                                  {domain.domain}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
