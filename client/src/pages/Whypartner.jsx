@@ -219,7 +219,7 @@ const WhyPartner = () => {
         </section>
 
         {/* Existing Partnerships */}
-        <section className="py-16 bg-muted/30">
+        {/* <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold text-card-foreground dark:text-white text-center mb-12 fade-in-up">
@@ -247,7 +247,7 @@ const WhyPartner = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Join Us Today */}
         <section className="py-16">

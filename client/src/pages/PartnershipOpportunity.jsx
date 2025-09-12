@@ -283,7 +283,7 @@ const PartnershipOpportunity = () => {
                   diverse opportunities and collaborative environment have been
                   instrumental in our success."
                   <cite className="block mt-2 text-sm font-semibold text-purple-600 dark:text-purple-400">
-                    — [Partner Name, Business Name]
+                    — [Raj Shah, ARKinfoserv]
                   </cite>
                 </blockquote>
                 <h3 className="text-xl font-semibold mt-8 mb-3 text-purple-600 dark:text-purple-400">
