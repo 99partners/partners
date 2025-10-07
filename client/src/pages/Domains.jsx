@@ -125,7 +125,6 @@ const Domains = () => {
       <Helmet>
         <title>99Partners Domains – Digital Commerce, IT, Finance, Wellness</title>
         <meta name="description" content="Explore 99Partners' business domains: digital commerce, IT services, financial solutions, and spiritual wellness. Discover how we empower growth across sectors." />
-        <meta name="robots" content="noindex, nofollow" />
         <meta property="og:title" content="99Partners Domains – Digital Commerce, IT, Finance, Wellness" />
         <meta property="og:description" content="Explore 99Partners' business domains: digital commerce, IT services, financial solutions, and spiritual wellness." />
         <meta property="og:type" content="website" />
